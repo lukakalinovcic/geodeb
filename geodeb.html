@@ -1,0 +1,343 @@
+<head>
+  <link rel="stylesheet" href="main.css">
+  <script src="rainbow.js"></script>
+  <script src="viewport.js"></script>
+  <script src="movieroll.js"></script>
+</head>
+<body>
+  <canvas id="canvas">
+  </canvas>
+  <div class="debug-panel">
+    Debug file: <input type="file" id="debugFile"/>
+  </div>
+  <div class="source-panel">
+    <div class="source-div">
+      <pre id="sourcePre"><code id="sourceBox"></code></pre>
+    </div>
+  </div>
+</body>
+
+<script type="text/javascript">
+  
+  var canvas = document.getElementById('canvas');
+  var viewport = new Viewport(canvas);
+  
+  function escape(s) {
+      var escaped = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+      };
+      return s.replace(/[&<>'"]/g, function (m) {
+          return escaped[m];
+      });
+  }
+  
+  var jsonData = null;
+  var movieRoll = null;
+  var drawStack = []; 
+  function restart() {
+      var jsonStr = localStorage.getItem('current_json_data');
+      jsonData = null;
+      if (jsonStr) {
+					try {
+							jsonData = JSON.parse(jsonStr);
+          } catch (err) {
+              console.error(err);
+          }
+      }
+      document.getElementById('sourceBox').innerHTML = '';
+      movieRoll = null;
+      drawStack = [];
+      if (jsonData) {
+          if (jsonData.source_code) {
+              var src = processSource(jsonData.source_code.join(''));
+              document.getElementById('sourceBox').innerHTML = src;
+          }
+          if (jsonData.root) {
+              movieRoll = new MovieRoll(jsonData.root);
+          }
+			}
+			nextFrame();
+  }
+  
+  function processSource(src) {
+      src = escape(src);
+      for (var i = 0; i < src.length;) {
+          var i = src.indexOf('GD_', i);
+          if (i < 0) {
+              break;
+          }
+          var begin = src.lastIndexOf('\n', i) + 1;
+          var end = src.indexOf('\n', i);
+          var inside = src.substring(begin, end);
+          var new_inside = '<span class="check">' + inside + '</span>';
+          src = src.substr(0, begin) + new_inside + src.substr(end);
+          i = begin + new_inside.length;
+      }
+      return src;
+  }
+  
+  function handleDebugSelect(evt) {
+      var files = evt.target.files;
+      if (files.length != 1) return;
+      var reader = new FileReader();
+      reader.onload = function(e) {
+          localStorage.setItem("current_json_data", e.target.result);
+          restart();
+      };
+      reader.readAsText(files[0]);
+  }
+  
+  function resize() {
+      var canvas = document.getElementById('canvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      draw();
+  }
+  
+  var polys = [];
+  for (var iter = 0; iter < 3; ++iter) {
+      var arg = Math.random() * 6.28;
+      var R = (iter + 1) * 17;
+      var n = (iter + 1) * 30;
+      for (var i = 0; i < n; ++i) {
+          var x0 = 60 + Math.sin(i / n * 5.8 + arg) * R;
+          var y0 = 50 + Math.cos(i / n * 5.8 + arg) * R;
+          var x1 = x0 + Math.random() * 8 - 4;
+          var y1 = y0 + Math.random() * 8 - 4;
+          var x2 = x0 + Math.random() * 16 - 8;
+          var y2 = y0 + Math.random() * 16 - 8;
+          var x3 = x0 + Math.random() * 16 - 8;
+          var y3 = y0 + Math.random() * 16 - 8;
+          var area = Math.abs((x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1));
+          if (area < 100) {
+              --i; continue;
+          }
+          var color = rainbowProgress(i, n);
+          polys.push([[x1, y1], [x2, y2], [x3, y3], color]);
+      }
+  }
+  
+  function draw() {
+      var canvas = document.getElementById('canvas');
+      var W = canvas.width;
+      var H = canvas.height;
+      var ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, W, H);
+      
+      /*
+        var rainbowRes = 800;
+        var rainbowWidth = W - 550 - Math.random() * 20;
+        var rectWidth = rainbowWidth / rainbowRes;
+        for (var i = 0; i < rainbowRes; ++i) {
+        rgb = rainbowProgress(i, rainbowRes);
+        ctx.beginPath();
+        ctx.rect(20 + i * rectWidth, 60, rectWidth + 1, 100);
+        ctx.fillStyle = 'rgb(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ')';
+        ctx.fill();
+        }
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(W, H);
+        ctx.stroke();
+      */
+      
+      var x1 = viewport.x0;
+      var y1 = viewport.y0;
+      var x2 = x1 + W * viewport.scale;
+      var y2 = y1 + H * viewport.scale;
+      var p0 = 1;
+      while (p0 / viewport.scale < 15) p0 *= 2;
+      var pAdjustment = p0 / viewport.scale / 15;
+      ctx.lineWidth = 1;
+      for (var p = p0; p <= p0 * 16; p *= 2) {
+          var spacing = p / viewport.scale;
+          var pp = p / p0;
+          var greyness = Math.max(175, 255 - (p / viewport.scale / 15) * 5);
+          ctx.strokeStyle = 'rgb(' + greyness + ', ' + greyness + ', ' + greyness + ')';
+          for (var i = Math.floor(x1 / p); i * p <= x2; i += 1) {
+              var clientX = (i * p - viewport.x0) / viewport.scale;
+              var t = (i & -i);
+              if (pp < 16 && t >= 2) continue;
+              ctx.beginPath();
+              ctx.moveTo(clientX, 0);
+              ctx.lineTo(clientX, H);
+              ctx.stroke();
+          } 
+          for (var i = Math.floor(y1 / p); i * p <= y2; i += 1) {
+              var clientY = H - (i * p - viewport.y0) / viewport.scale;
+              var t = (i & -i);
+              if (pp < 16 && t >= 2) continue;
+              ctx.beginPath();
+              ctx.moveTo(0, clientY);
+              ctx.lineTo(W, clientY);
+              ctx.stroke();
+          }
+      }
+
+      /*
+      polys.forEach(function(poly, i) {
+          rgb = poly[3]
+          ctx.fillStyle = 'rgb(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ')';
+          ctx.strokeStyle = 'rgb(' + 0.7*rgb[0] + ', ' + 0.7*rgb[1] + ', ' + 0.7*rgb[2] + ')';
+          ctx.beginPath();
+          var x1 = (poly[0][0] - viewport.x0) / viewport.scale;
+          var x2 = (poly[1][0] - viewport.x0) / viewport.scale;
+          var x3 = (poly[2][0] - viewport.x0) / viewport.scale;
+          var y1 = H - (poly[0][1] - viewport.y0) / viewport.scale;
+          var y2 = H - (poly[1][1] - viewport.y0) / viewport.scale;
+          var y3 = H - (poly[2][1] - viewport.y0) / viewport.scale;
+          
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.lineTo(x3, y3);
+          ctx.lineTo(x1, y1);
+          ctx.fill();
+          ctx.stroke();
+          });*/
+      drawStack.forEach(function(item) {
+	  var color = 'black';
+	  if (item.attr.substr(0, 6) == 'color:') {
+	      color = item.attr.substr(6);;
+	  }
+	  if (color == 'rainbow') {
+	      color = 'black';
+          }
+          ctx.strokeStyle = color;
+          if (item.type == 'point') {
+              var x = (item.x - viewport.x0) / viewport.scale;
+              var y = H - (item.y - viewport.y0) / viewport.scale;
+              ctx.fillStyle = 'blue';
+              ctx.beginPath();
+              ctx.arc(x, y, 3, 0, 2 * Math.PI, true);
+              ctx.fill();
+              ctx.stroke();
+          } else if (item.type == 'segment') {
+              var x1 = (item.x1 - viewport.x0) / viewport.scale;
+              var y1 = H - (item.y1 - viewport.y0) / viewport.scale;
+              var x2 = (item.x2 - viewport.x0) / viewport.scale;
+              var y2 = H - (item.y2 - viewport.y0) / viewport.scale;          
+              ctx.beginPath();
+              ctx.moveTo(x1, y1);
+              ctx.lineTo(x2, y2);
+              ctx.stroke();
+          } else if (item.type == 'polyline' || item.type == 'polygon') {
+	      ctx.fillStyle = 'rgb(255, 180, 180)';
+	      /*
+	      if (color == 'rainbow') {
+		  ctx.lineWidth = 1;
+	      } else {
+		  ctx.lineWidth = 3;
+	      }
+*/
+		  
+	      //console.log('drawing', item);
+	      ctx.beginPath();
+	      var firstx = null;
+	      var firxty = null;
+              item.points.forEach(function(point, i) {
+                  var x = (point[0] - viewport.x0) / viewport.scale;
+                  var y = H - (point[1] - viewport.y0) / viewport.scale;
+		  if (i == 0) {
+		      firstx = x;
+		      firsty = y;
+                      ctx.moveTo(x, y);
+                  } else {
+                      ctx.lineTo(x, y);
+                  }
+              });
+              if (item.type == 'polygon') {
+                  ctx.lineTo(firstx, firsty);
+                  ctx.fill();
+              }
+              ctx.stroke();
+          } else {
+              //console.log('ignoring ', item);
+          }
+      });
+  }
+
+
+  function nextFrame() {
+      if (movieRoll == null) return;
+      var anyAction = false;
+      for (;;) {
+          var transition = movieRoll.currentFrame.next;
+          if (transition == null) break;
+          transition.actions.forEach(function(action) {
+              if (action.type == 'add') {
+                  anyAction = true;
+                  drawStack.push(action.data);
+              } else if (action.type == 'remove') {
+                  drawStack.pop();
+              }
+          });
+          movieRoll.currentFrame = transition.next;
+          if (movieRoll.currentFrame.breakpoint && anyAction) break;
+      }
+      draw();
+  }
+
+  function prevFrame() {
+      if (movieRoll == null) return;
+      var anyAction = false;
+      for (;;) {
+          var transition = movieRoll.currentFrame.prev;
+          if (transition == null) break;
+          transition.actions.forEach(function(action) {
+	      //console.log('Action ', action.type, action.data);
+	      if (action.type == 'remove') {
+		  anyAction = true;
+		  drawStack.push(action.data);
+	      } else if (action.type == 'add') {
+		  drawStack.pop();
+	      }
+	  });
+	  movieRoll.currentFrame = transition.prev;
+	  if (movieRoll.currentFrame.breakpoint && anyAction) break;
+      }
+      draw();
+  }
+
+  function keypress(e) {
+      if (e.key == 'ArrowRight') {
+	  nextFrame();
+      } else if (e.key == 'ArrowLeft') {
+	  prevFrame();
+      }
+  }
+
+  viewport.addEventListener(draw);
+  
+  restart();
+  resize();
+  window.addEventListener('resize', resize, false);
+  document.addEventListener('keydown', keypress, false);
+  document.getElementById('debugFile').addEventListener('change', handleDebugSelect, false);
+  
+  
+  
+  // Tmp scrolling code.
+  function firstCheck() {
+      var checks = document.getElementsByClassName('check');
+      if (checks) {
+          scrollIntoSourceBox(checks[Math.round(checks.length / 2)]);
+      }
+  }
+  
+  function scrollIntoSourceBox(element) {
+      var sourceBox = document.getElementById('sourcePre');
+      var outer = sourceBox.getBoundingClientRect();
+      var inner = element.getBoundingClientRect();
+      if (inner.top < outer.top) {
+          element.scrollIntoView(true);
+      }
+      if (inner.bottom > outer.bottom) {
+          element.scrollIntoView(false);
+      }
+  }
+  
+</script>
