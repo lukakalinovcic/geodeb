@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+<html>
 <head>
   <link rel="stylesheet" href="main.css">
   <script src="rainbow.js"></script>
@@ -35,7 +37,6 @@
   </div>
   </div>
 </body>
-
 <script type="text/javascript">
   var debugFile = document.getElementById('debugFile');
   var selectFileButton = document.getElementById('selectFile');
@@ -131,12 +132,13 @@
   
   function resize() {
       W = window.innerWidth;
-      H = window.innerHeight - 37;
-      canvas.width = W;
-      canvas.height = H;
+      H = window.innerHeight - 41;
       var targetWidth = sourceView.lines.length == 0 ? 180 : 700;
+      var actualWidth = Math.min(targetWidth, Math.floor(W / 2));
       sourceElement.style.height = H + 'px';
-      sourceElement.style.width = Math.min(targetWidth, W / 2) + 'px';
+      sourceElement.style.width = actualWidth + 'px';
+      canvas.width = W - actualWidth;
+      canvas.height = H;
   }
 
 
@@ -407,54 +409,5 @@
   stepPrevButton.addEventListener('click', function() { prevFrame(true); }, false);
   stepNextButton.addEventListener('click', function() { nextFrame(true); }, false);
   jumpNextButton.addEventListener('click', function() { nextFrame(false); }, false);
-  
-  // TMP code.
-
-      /*
-      polys.forEach(function(poly, i) {
-          rgb = poly[3]
-          ctx.fillStyle = 'rgb(' + rgb[0] + ', ' + rgb[1] + ', ' + rgb[2] + ')';
-          ctx.strokeStyle = 'rgb(' + 0.7*rgb[0] + ', ' + 0.7*rgb[1] + ', ' + 0.7*rgb[2] + ')';
-          ctx.beginPath();
-          var x1 = (poly[0][0] - viewport.x0) / viewport.scale;
-          var x2 = (poly[1][0] - viewport.x0) / viewport.scale;
-          var x3 = (poly[2][0] - viewport.x0) / viewport.scale;
-          var y1 = H - (poly[0][1] - viewport.y0) / viewport.scale;
-          var y2 = H - (poly[1][1] - viewport.y0) / viewport.scale;
-          var y3 = H - (poly[2][1] - viewport.y0) / viewport.scale;
-          
-          ctx.moveTo(x1, y1);
-          ctx.lineTo(x2, y2);
-          ctx.lineTo(x3, y3);
-          ctx.lineTo(x1, y1);
-          ctx.fill();
-          ctx.stroke();
-          });*/
-  /*  
-  var polys = [];
-  for (var iter = 0; iter < 3; ++iter) {
-      var arg = Math.random() * 6.28;
-      var R = (iter + 1) * 17;
-      var n = (iter + 1) * 30;
-      for (var i = 0; i < n; ++i) {
-          var x0 = 60 + Math.sin(i / n * 5.8 + arg) * R;
-          var y0 = 50 + Math.cos(i / n * 5.8 + arg) * R;
-          var x1 = x0 + Math.random() * 8 - 4;
-          var y1 = y0 + Math.random() * 8 - 4;
-          var x2 = x0 + Math.random() * 16 - 8;
-          var y2 = y0 + Math.random() * 16 - 8;
-          var x3 = x0 + Math.random() * 16 - 8;
-          var y3 = y0 + Math.random() * 16 - 8;
-          var area = Math.abs((x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1));
-          if (area < 100) {
-              --i; continue;
-          }
-          var color = rainbowProgress(i, n);
-          polys.push([[x1, y1], [x2, y2], [x3, y3], color]);
-      }
-  }*/
-
-      
- 
-  
 </script>
+</html>
