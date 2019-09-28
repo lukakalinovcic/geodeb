@@ -2,33 +2,135 @@ body {
     margin: 0px;
 }
 
-.debug-panel {
-    position: absolute;
-    top: 10px;
-    left: 10px;
+.top-panel {
+    height: 36px;
     background-color: white;
+    border-bottom: 1px black solid;
+    overflow-x: hidden;
+}
+
+.top-panel div {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 8px;
+    margin-right: 8px;
+}
+
+.debug-panel {
+}
+
+.message-panel .error {
+    color: red;
+}
+.message-panel .ok {
+    color: green;
+}
+
+.frame-panel button {
+    width: 64px;
+}
+.frame-panel button.step {
+    width: 30px;
+}
+.frame-panel .tmp {
+    margin-left: 32px;
+}
+
+.coords-panel {
+    width: 128px;
+    text-align: center;
+}
+
+.vertical-bar {
+    width: 1px;
+    height: 32px;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    background-color: grey;
 }
 
 .source-panel {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 37px;
+    right: 0px;
     background-color: white;
+    border-left: 1px black solid;
 }
 
-.source-div {
-    border-color: black;
-    border-width: 1px;
-    border-style: solid;
-}
-
-.source-div pre {
+.source-panel pre {
     margin: 0px;
-    width: 500px;
-    height: 800px;
     overflow: auto;
 }
 
-.source-div .check {
-    background-color: yellow;
+.src-line {
+    position: relative;
+    background-color: white;
+    transition: background-color 1.0s linear;
+}
+
+.src-line.added {
+    transition: none;
+    background-color: palegreen;
+}
+
+.src-line.removed {
+    transition: none;
+    background-color: salmon;
+}
+
+.src-line .tooltip {
+    background-color: black;
+    color: white;
+    position: absolute;
+    left: 0px;
+    top: 16px;
+    z-index: 1;
+    padding: 6px;
+    border: 1px gray solid;
+    border-radius: 5px;
+    opacity: 0;
+    transition: opacity 1s;
+}
+
+.src-line.new-tooltip .tooltip {    
+    transition: none;
+    opacity: 1;
+}
+
+.src-line.has-tooltip:hover .tooltip {    
+    transition: none;
+    opacity: 1;
+}
+
+
+.dark {
+    color: white;
+    background-color: black;
+}
+.dark .top-panel {
+    background-color: black;
+    border-bottom-color: white;
+}
+.dark .source-panel {
+    background-color: black;
+    border-left-color: white;
+}
+.dark .src-line {
+    background-color: black;
+}
+.dark .src-line.added {
+    background-color: green;
+}
+.dark .src-line.removed {
+    background-color: indianred;
+}
+.dark .src-line .tooltip {
+    background-color: white;
+    color: black;
+}
+.dark .message-panel .error {
+    color: red;
+}
+.dark .message-panel .ok {
+    color: lime;
 }

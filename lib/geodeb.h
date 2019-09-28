@@ -16,18 +16,18 @@
 
 #define GD_INIT(filename)                                   \
   const geodeb::RootScope geodeb_root(                      \
-    geodeb::GetFileSingleton(filename, __FILE__, __LINE__))
+    geodeb::GetFileSingleton(filename, __FILE__, __LINE__), false)
+#define GD_DARK(filename)                                   \
+  const geodeb::RootScope geodeb_root(                      \
+    geodeb::GetFileSingleton(filename, __FILE__, __LINE__), true)
 #define GD_SET_PRECISION(precision)             \
   geodeb::SetPrecision(precision)
 #define GD_LOG_TO_STDERR(log_to_stderr)         \
   geodeb::SetLogToStderr(log_to_stderr)
-
-#define GD_LAYER2(name, attr)                                     \
-  geodeb::Layer _GD_CONCAT(geodeb_layer_, name)(attr, __LINE__);  \
-  _GD_CONCAT(geodeb_layer_,name)
-#define GD_LAYER1(name)                         \
-    GD_LAYER2(name, "")
-#define GD_LAYER(...) _GD_VFUNC(GD_LAYER, __VA_ARGS__)
+  
+#define GD_LAYER()                                                      \
+  geodeb::Layer _GD_CONCAT(geodeb_layer_, __LINE__)(__LINE__);          \
+  _GD_CONCAT(geodeb_layer_, __LINE__)
 
 #define GD_PAUSE()                              \
   geodeb::Breakpoint(__LINE__)
@@ -38,52 +38,67 @@
   GD_POINT3(x, y, "")
 #define GD_POINT(...) _GD_VFUNC(GD_POINT, __VA_ARGS__)
 
-#define GD_POLYGON2(attr, code)                               \
-  { geodeb::PolyBuilder poly(attr, true, __LINE__); code } 0
-#define GD_POLYGON1(code)                       \
-  GD_POLYGON2("", code);
-#define GD_POLYGON(...) _GD_VFUNC(GD_POLYGON, __VA_ARGS__)
-
-#define GD_POLYLINE2(attr, code)                              \
-  { geodeb::PolyBuilder poly(attr, false, __LINE__); code } 0
-#define GD_POLYLINE1(code)                          \
-  GD_POLYLINE2("", code);
-#define GD_POLYLINE(...) _GD_VFUNC(GD_POLYLINE, __VA_ARGS__)
-
-#define GD_POLYPOINT(x, y) poly.Add(x, y, __LINE__)
-
-#define GD_SEGMENT5(x1, y1, x2, y2, attr)         \
+#define GD_SEGMENT5(x1, y1, x2, y2, attr)               \
   geodeb::Segment(x1, y1, x2, y2, attr, __LINE__)
 #define GD_SEGMENT4(x1, y1, x2, y2)             \
   GD_SEGMENT5(x1, y1, x2, y2, "")
 #define GD_SEGMENT(...) _GD_VFUNC(GD_SEGMENT, __VA_ARGS__)
 
-#define GD_LINE5(x1, y1, x2, y2, attr)            \
+#define GD_TRIANGLE7(x1, y1, x2, y2, x3, y3, attr)              \
+  geodeb::Triangle(x1, y1, x2, y2, x3, y3, attr, __LINE__)
+#define GD_TRIANGLE6(x1, y1, x2, y2, x3, y3)    \
+  GD_TRIANGLE7(x1, y1, x2, y2, x3, y3, "")
+#define GD_TRIANGLE(...) _GD_VFUNC(GD_TRIANGLE, __VA_ARGS__)
+
+#define GD_RECTANGLE5(x1, y1, x2, y2, attr)             \
+  geodeb::Rectangle(x1, y1, x2, y2, attr, __LINE__)
+#define GD_RECTANGLE4(x1, y1, x2, y2)    \
+  GD_RECT5(x1, y1, x2, y2, "")
+#define GD_RECTANGLE(...) _GD_VFUNC(GD_RECTANGLE, __VA_ARGS__)
+#define GD_RECT(...) _GD_VFUNC(GD_RECTANGLE, __VA_ARGS__)
+
+#define GD_LINE5(x1, y1, x2, y2, attr)          \
   geodeb::Line(x1, y1, x2, y2, attr, __LINE__)
 #define GD_LINE4(x1, y1, x2, y2)                \
   GD_LINE5(x1, y1, x2, y2, "")
 #define GD_LINE(...) _GD_VFUNC(GD_LINE, __VA_ARGS__)
+
+#define GD_CIRCLE4(x, y, r, attr)               \
+  geodeb::Circle(x, y, r, attr, __LINE__)
+#define GD_CIRCLE3(x, y, r)                     \
+  GD_CIRCLE4(x, y, r, "")
+#define GD_CIRCLE(...) _GD_VFUNC(GD_CIRCLE, __VA_ARGS__)
+#define GD_CIRC(...) _GD_VFUNC(GD_CIRCLE, __VA_ARGS__)
+
+#define GD_POLYGON2(attr, code)                                 \
+  { geodeb::PolyBuilder poly(attr, true, __LINE__); code } 0
+#define GD_POLYGON1(code)                       \
+  GD_POLYGON2("", code);
+#define GD_POLYGON(...) _GD_VFUNC(GD_POLYGON, __VA_ARGS__)
+
+#define GD_POLYLINE2(attr, code)                                \
+  { geodeb::PolyBuilder poly(attr, false, __LINE__); code } 0
+#define GD_POLYLINE1(code)                      \
+  GD_POLYLINE2("", code);
+#define GD_POLYLINE(...) _GD_VFUNC(GD_POLYLINE, __VA_ARGS__)
+
+#define GD_POLYPOINT(x, y) poly.Add(x, y, __LINE__)
 
 namespace geodeb {
   
 // Global vars.
 FILE* geodeb_file = nullptr;
 std::string pad;
-std::string log_pad;
 bool log_to_stderr = true;
 int precision = 3;
 bool poly_active = false;
 bool omit_comma = true;
 
 void AddPadding() {
-  pad += " ";
-  //if (logging) log_pad += "  ";
-  log_pad += "  ";
+  pad += "  ";
 }
 void RemovePadding() {
-  pad.resize(pad.size() - 1);
-  //if (logging) log_pad.resize(log_pad.size() - 2);
-  log_pad.resize(log_pad.size() - 2);
+  pad.resize(pad.size() - 2);
 }
 
 void json_println(const char* format, ...) {
@@ -136,7 +151,9 @@ void json_end_object() {
   json_println("}");
 }
 void log_prefix(int line) {
-  fprintf(stderr, "L%03d: %s ", line, log_pad.c_str());
+  // TODO(kalinov): Do it in a less hacky way.
+  const int start = std::min(8, (int)pad.size());
+  fprintf(stderr, "L%03d: %s", line, pad.c_str() + start);
 }
  
 std::string JsonEscape(const std::string &s) {
@@ -215,11 +232,7 @@ class OperationWithLogging : public Operation {
 
 class Layer : public OperationWithLogging {
  public:
-  Layer(const std::string& attr, int line)
-      : OperationWithLogging("layer", line, {}, true) {
-    if (!attr.empty()) {
-      json_print_string("attr", attr);
-    }
+  Layer(int line) : OperationWithLogging("layer", line, {}, true) {
     json_start_array("children");
   }
   ~Layer() {
@@ -254,6 +267,55 @@ class Segment : public OperationWithLogging {
     json_print_double("y1", y1);
     json_print_double("x2", x2);
     json_print_double("y2", y2);
+    if (!attr.empty()) {
+      json_print_string("attr", attr);
+    }
+  }
+};
+
+class Triangle : public OperationWithLogging {
+ public:
+  Triangle(double x1, double y1,
+           double x2, double y2,
+           double x3, double y3,
+           const std::string& attr, int line)
+      : OperationWithLogging("triangle", line, {x1, y1, x2, y2, x3, y3}) {
+    json_print_double("x1", x1);
+    json_print_double("y1", y1);
+    json_print_double("x2", x2);
+    json_print_double("y2", y2);
+    json_print_double("x3", x3);
+    json_print_double("y3", y3);
+    if (!attr.empty()) {
+      json_print_string("attr", attr);
+    }
+  }
+};
+
+class Rectangle : public OperationWithLogging {
+ public:
+  Rectangle(double x1, double y1,
+            double x2, double y2,
+            const std::string& attr, int line)
+      : OperationWithLogging("rect", line, {x1, y1, x2, y2}) {
+    json_print_double("x1", x1);
+    json_print_double("y1", y1);
+    json_print_double("x2", x2);
+    json_print_double("y2", y2);
+    if (!attr.empty()) {
+      json_print_string("attr", attr);
+    }
+  }
+};
+
+class Circle : public OperationWithLogging {
+ public:
+  Circle(double x, double y, double r,
+         const std::string& attr, int line)
+      : OperationWithLogging("circ", line, {x, y, r}) {
+    json_print_double("x", x);
+    json_print_double("y", y);
+    json_print_double("r", r);
     if (!attr.empty()) {
       json_print_string("attr", attr);
     }
@@ -307,10 +369,11 @@ class PolyBuilder : public OperationWithLogging {
 
 class RootScope {
  public:
-  RootScope(FILE* f) : f(f){}
+  RootScope(FILE* f, bool dark) : f(f), dark_(dark) {}
   ~RootScope() {
     json_end_array();
     json_end_object();
+    json_print_string("theme", dark_ ? "dark" : "light");
     json_end_object();
     fprintf(geodeb_file, "\n");
     fclose(f);
@@ -319,6 +382,7 @@ class RootScope {
   }
  private:
   FILE *f;
+  bool dark_;
 };
 
 FILE* GetFileSingleton(const std::string& filename,
