@@ -2,7 +2,7 @@ class Frame {
     constructor() {
         this.prev = null;
         this.next = null;
-	this.breakpoint = false;
+        this.breakpoint = false;
     }
 }
 
@@ -21,50 +21,101 @@ class Action {
     }
 }
 
+function incrementProgress(progress, line) {
+    if (!(line in progress)) {
+        progress[line] = 0;
+    }
+    progress[line] = progress[line] + 1;
+    return progress[line];
+}
+
+function updateLabel(data, line, newLabel) {
+    var oldLabel = '';
+    if (line in data) {
+        oldLabel = data[line];
+    }
+    data[line] = newLabel;
+    return oldLabel;
+}
+
 class MovieRoll {
     constructor(root) {
-	this.currentFrame = new Frame();
-        this.build(root, this.currentFrame);
+        this.currentFrame = new Frame();
+        var progress = {};
+        this.build(root, this.currentFrame, progress, {}, []);
+        for (var frame = this.currentFrame; frame.next != null;
+             frame = frame.next.next) {
+            var transition = frame.next;
+            transition.actions.forEach(function(action) {
+                if (action.type == 'add') {
+                    action.data.progress /= progress[action.data.line];
+                }
+            });
+        }
     }
 
-    build(node, last_frame) {
+    appendFrame(lastFrame) {
+        var transition = new Transition();
+        var nextFrame = new Frame();
+        transition.prev = lastFrame;
+        transition.next = nextFrame;
+        lastFrame.next = transition;
+        nextFrame.prev = transition;
+        return nextFrame;
+    }
+
+    build(node, lastFrame, progress, labels, transitions) {
         if (node.children) {
             node.children.forEach(function(child) {
+                var line = child.line;
+                var i = incrementProgress(progress, line);
+                var newLabel = ('label' in child) ? child.label : '';
+                var oldLabel = updateLabel(labels, line, newLabel);
+                lastFrame = this.appendFrame(lastFrame);
+                var transition = lastFrame.prev;
+                var data = {
+                    'type': child.type,
+                    'line': line,
+                    'oldLabel': oldLabel,
+                    'newLabel': newLabel
+                };
+                transition.actions.push(new Action('execute', data));
                 if (child.type == 'layer') {
-                    var start_frame = last_frame;
-                    last_frame.breakpoint = true;
-                    last_frame = this.build(child, last_frame);
-                    last_frame.breakpoint = true;
-
-                    var transition = new Transition();
-                    var next_frame = new Frame();
-                    transition.prev = last_frame;
-                    transition.next = next_frame;
-                    last_frame.next = transition;
-                    next_frame.prev = transition;
-                    // TODO(kalinov): See what to do with nextd layers.
-                    for (var frame = last_frame; frame != start_frame;
-                         frame = frame.prev.prev) {
-                        frame.prev.actions.forEach(function(action) {
-                            transition.actions.push(
-                                new Action('remove', action.data))
-                        });
+                    var layerTransitions = [];
+                    var startFrame = lastFrame;
+                    lastFrame = this.build(child, lastFrame, progress, labels,
+                                           layerTransitions);
+                    lastFrame.breakpoint = true;
+                    lastFrame = this.appendFrame(lastFrame);
+                    for (var i = layerTransitions.length - 1; i >= 0; --i) {
+                        var transition = layerTransitions[i];
+                        for (var j = transition.actions.length - 1; j >= 0; --j) {
+                            var action = transition.actions[j];
+                            if (action.type == 'add') {
+                                lastFrame.prev.actions.push(
+                                    new Action('remove', action.data));
+                            }
+                        }
                     }
-                    last_frame = next_frame;
                 } else if (child.type == 'break') {
-                    last_frame.breakpoint = true;
+                    lastFrame.breakpoint = true;
                 } else {
-                    var transition = new Transition();
-                    var next_frame = new Frame();
-                    transition.prev = last_frame;
-                    transition.next = next_frame;
-                    last_frame.next = transition;
-                    next_frame.prev = transition;
+                    if (child.type == 'triangle') {
+                        child.points = [[child.x1, child.y1],
+                                        [child.x2, child.y2],
+                                        [child.x3, child.y3]];
+                    } else if (child.type == 'rect') {
+                        child.points = [[child.x1, child.y1],
+                                        [child.x1, child.y2],
+                                        [child.x2, child.y2],
+                                        [child.x2, child.y1]];
+                    }
+                    child['progress'] = i - 0.5;
                     transition.actions.push(new Action('add', child));
-                    last_frame = next_frame;
+                    transitions.push(transition);
                 }
             }.bind(this));
         }
-        return last_frame;
+        return lastFrame;
     }
 }

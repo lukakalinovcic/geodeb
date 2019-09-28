@@ -9,6 +9,10 @@ function rainbow(f) {
     return wavelengthToRGB(wavelength);
 }
 
+function lightRainbow(f) {
+    return rainbow(f).map(function(x) { return 255 * 0.8 + x * 0.2; });
+}
+
 function wavelengthToRGB(wavelength){
     var xyz = cie1931WavelengthToXYZFit(wavelength);
     var rgb = srgbXYZ2RGB(xyz);
