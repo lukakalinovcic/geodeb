@@ -80,6 +80,12 @@
 #define GD_CIRCLE(...) _GD_VFUNC(GD_CIRCLE, __VA_ARGS__)
 #define GD_CIRC(...) _GD_VFUNC(GD_CIRCLE, __VA_ARGS__)
 
+#define GD_ARC6(x, y, r, sAngle, eAngle, attr)          \
+  geodeb::Arc(x, y, r, sAngle, eAngle, attr, __LINE__)
+#define GD_ARC5(x, y, r, sAngle, eAngle)        \
+  GD_ARC6(x, y, r, sAngle, eAngle, "")
+#define GD_ARC(...) _GD_VFUNC(GD_ARC, __VA_ARGS__)
+
 #define GD_POLYGON2(attr, code)                                 \
   { geodeb::PolyBuilder poly(attr, true, __LINE__); code } 0
 #define GD_POLYGON1(code)                       \
@@ -326,6 +332,22 @@ class Circle : public OperationWithLogging {
     json_print_double("x", x);
     json_print_double("y", y);
     json_print_double("r", r);
+    if (!attr.empty()) {
+      json_print_string("attr", attr);
+    }
+  }
+};
+
+class Arc : public OperationWithLogging {
+ public:
+  Arc(double x, double y, double r, double sAngle, double eAngle,
+      const std::string& attr, int line)
+      : OperationWithLogging("arc", line, {x, y, r, sAngle, eAngle}) {
+    json_print_double("x", x);
+    json_print_double("y", y);
+    json_print_double("r", r);
+    json_print_double("sAngle", sAngle);
+    json_print_double("eAngle", eAngle);
     if (!attr.empty()) {
       json_print_string("attr", attr);
     }

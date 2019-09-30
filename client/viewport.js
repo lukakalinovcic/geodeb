@@ -38,7 +38,7 @@ class Viewport {
         var scale = Math.max(1.05 * dx / W, 1.05 * dy / H);
         var x0 = centerX - W / 2 * scale;
         var y0 = centerY - H / 2 * scale;
-        // TODO(kalinov): Check the math.
+        // TODO(kalinov): Rework this.
         var shouldMove = (Math.abs(x0 - this.x0) > 0.001 ||
                           Math.abs(y0 - this.y0) > 0.001 ||
                           Math.abs(Math.log(scale) -

@@ -7,15 +7,15 @@ function initScripts(dir, callback) {
     var scripts = ['rainbow.js', 'viewport.js', 'movieroll.js', 'source-view.js'];
     var loaded = 0;
     scripts.forEach(function(script, i) {
-	var scriptTag = document.createElement('script');
-	scriptTag.src = dir + script;
-	scriptTag.onload = function () {
-	    loaded += 1;
-	    if (loaded == scripts.length) {
-		callback();
-	    }
-	};
-	document.head.appendChild(scriptTag);
+  var scriptTag = document.createElement('script');
+  scriptTag.src = dir + script;
+  scriptTag.onload = function () {
+      loaded += 1;
+      if (loaded == scripts.length) {
+    callback();
+      }
+  };
+  document.head.appendChild(scriptTag);
     });
     var cssTag = document.createElement('link');
     cssTag.rel = 'stylesheet';
@@ -236,6 +236,18 @@ function runApp() {
                   ctx.fill();
               }
               ctx.stroke();
+          } else if (item.type == 'arc') {
+              ctx.beginPath();
+              var centerX = canvasX(0);
+              var centerY = canvasY(0);
+              ctx.moveTo(centerX, centerY);
+              ctx.arc(canvasX(item.x), canvasY(item.y), item.r / viewport.scale,
+                      -item.eAngle, -item.sAngle, false);
+              ctx.lineTo(centerX, centerY);
+              if (hasFill) {
+                  ctx.fill();
+              }
+              ctx.stroke();
           } else if (isPolygon || isPolyline) {
               var firstX = null;
               var firxtY = null;
@@ -310,13 +322,11 @@ function runApp() {
 
   function nextFrame(step) {
       if (movieRoll == null) return;
-      var anyAction = false;
       for (;;) {
           var transition = movieRoll.currentFrame.next;
           if (transition == null) break;
           transition.actions.forEach(function(action) {
               if (action.type == 'add') {
-                  anyAction = true;
                   drawStack.push(action.data);
               } else if (action.type == 'remove') {
                   drawStack.pop();
@@ -327,7 +337,7 @@ function runApp() {
               }
           });
           movieRoll.currentFrame = transition.next;
-          if (step || movieRoll.currentFrame.breakpoint && anyAction) break;
+          if (step || movieRoll.currentFrame.breakpoint) break;
       }
       if (!freeCameraCheckbox.checked) {
           var b = movieRoll.currentFrame.box;
@@ -338,14 +348,11 @@ function runApp() {
 
   function prevFrame(step) {
       if (movieRoll == null) return;
-      var anyAction = false;
       for (;;) {
           var transition = movieRoll.currentFrame.prev;
           if (transition == null) break;
-          transition.actions.forEach(function(action) {
-              //console.log('Action ', action.type, action.data);
+          transition.actions.slice().reverse().forEach(function(action) {
               if (action.type == 'remove') {
-                  anyAction = true;
                   drawStack.push(action.data);
               } else if (action.type == 'add') {
                   drawStack.pop();
@@ -356,7 +363,7 @@ function runApp() {
               }
           });
           movieRoll.currentFrame = transition.prev;
-          if (step || movieRoll.currentFrame.breakpoint && anyAction) break;
+          if (step || movieRoll.currentFrame.breakpoint) break;
       }
       if (!freeCameraCheckbox.checked) {
           var b = movieRoll.currentFrame.box;
