@@ -1,8 +1,8 @@
 class Viewport {
     constructor(canvas) {
         this.canvas = canvas;
-        this.x0 = -1;
-        this.y0 = -1;
+        this.x0 = -10;
+        this.y0 = -10;
         this.scale = 0.02;
 
         this.startTime = null;
@@ -26,6 +26,31 @@ class Viewport {
         canvas.addEventListener('mouseup', this.mouseUp.bind(this), false);
         canvas.addEventListener('mouseleave', this.mouseLeave.bind(this), false);
         canvas.addEventListener('wheel', this.mouseWheel.bind(this), false);
+    }
+
+    setBox(minX, minY, maxX, maxY, animate) {
+	var W = canvas.width;
+	var H = canvas.height;
+	var dx = maxX - minX + 1;
+	var dy = maxY - minY + 1;
+	var centerX = (minX + maxX) / 2;
+	var centerY = (minY + maxY) / 2;
+	var scale = Math.max(1.05 * dx / W, 1.05 * dy / H);
+	var x0 = centerX - W / 2 * scale;
+	var y0 = centerY - H / 2 * scale;
+	// TODO(kalinov): Check this.
+	var shouldMove = (Math.abs(x0 - this.x0) > 0.001 ||
+			  Math.abs(y0 - this.y0) > 0.001 ||
+			  Math.abs(Math.log(scale) - Math.log(this.scale)) > 0.001);
+	if (shouldMove) {
+	    if (animate) {
+  		this.setViewport(x0, y0, scale);
+	    } else {
+		this.x0 = x0;
+		this.y0 = y0;
+		this.scale = scale;
+	    }
+	}
     }
 
     setViewport(x0, y0, scale) {
