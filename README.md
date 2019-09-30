@@ -116,6 +116,6 @@ An alternative to GD_INIT that changes the UI theme to the dark mode, and makes 
 Museum of 2D art
 ----------------
 
-For more examples and some nice visualizations head over to the [museum of 2D art](https://lukakalinovcic.github.io/geodeb/).
+For more examples and some nice visualizations head over to the [Museum of 2D art](https://lukakalinovcic.github.io/geodeb/).
 
 If you want to donate a piece of 2D art to the museum, you can find my contact information on GitHub.
