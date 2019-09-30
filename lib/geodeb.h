@@ -14,12 +14,22 @@
 #define _GD_VFUNC_NAME(name, n) _GD_CONCAT(name, n)
 #define _GD_VFUNC(func, ...) _GD_VFUNC_NAME(func, _GD_ARG_COUNT(__VA_ARGS__))(__VA_ARGS__)
 
-#define GD_INIT(filename)                                   \
-  const geodeb::RootScope geodeb_root(                      \
-    geodeb::GetFileSingleton(filename, __FILE__, __LINE__), false)
-#define GD_DARK(filename)                                   \
-  const geodeb::RootScope geodeb_root(                      \
-    geodeb::GetFileSingleton(filename, __FILE__, __LINE__), true)
+#define GD_INIT3(filename, resource_path, dark)                         \
+  const geodeb::RootScope geodeb_root(                                  \
+      geodeb::OpenFile(filename, __FILE__, resource_path, __LINE__),   \
+      dark)                                                            
+#define GD_INIT2(filename, resource_path)       \
+  GD_INIT3(filename, resource_path, false);
+#define GD_INIT1(filename)                                              \
+  GD_INIT2(filename, "https://lukakalinovcic.github.io/geodeb") 
+#define GD_INIT(...) _GD_VFUNC(GD_INIT, __VA_ARGS__)
+
+#define GD_DARK2(filename, resource_path)       \
+  GD_INIT3(filename, resource_path, true)
+#define GD_DARK1(filename)       \
+  GD_DARG2(filename, "https://lukakalinovcic.github.io/geodeb")
+#define GD_DARK(...) _GD_VFUNC(GD_DARK, __VA_ARGS__)
+
 #define GD_SET_PRECISION(precision)             \
   geodeb::SetPrecision(precision)
 #define GD_LOG_TO_STDERR(log_to_stderr)         \
@@ -90,7 +100,7 @@ namespace geodeb {
 FILE* geodeb_file = nullptr;
 std::string pad;
 bool log_to_stderr = true;
-int precision = 3;
+int precision = 6;
 bool poly_active = false;
 bool omit_comma = true;
 
@@ -375,7 +385,10 @@ class RootScope {
     json_end_object();
     json_print_string("theme", dark_ ? "dark" : "light");
     json_end_object();
-    fprintf(geodeb_file, "\n");
+    fprintf(geodeb_file, ";\n");
+    fprintf(geodeb_file, "init(resourcePath);\n");
+    fprintf(geodeb_file, "</script>\n");
+    fprintf(geodeb_file, "</html>\n");
     fclose(f);
     fprintf(stderr, "geodeb: Don't forget to remove the debug code before "
             "submitting to online judges!\n");
@@ -385,12 +398,25 @@ class RootScope {
   bool dark_;
 };
 
-FILE* GetFileSingleton(const std::string& filename,
-                       const std::string& source_filename,
-                       int line) {
+FILE* OpenFile(const std::string& filename,
+               const std::string& source_filename,
+               const std::string& resource_path,
+               int line) {
   assert(geodeb_file == nullptr);
   geodeb_file = fopen(filename.c_str(), "wt");
   assert(geodeb_file != nullptr);
+
+  fprintf(geodeb_file, "<!DOCTYPE html>\n");
+  fprintf(geodeb_file, "<html>\n");
+  fprintf(geodeb_file, "<head>\n");
+  fprintf(geodeb_file, "  <script src=\"%s/main.js\"></script>\n", resource_path.c_str());
+  fprintf(geodeb_file, "</head>\n");
+  fprintf(geodeb_file, "<body>\n");
+  fprintf(geodeb_file, "  <div id=\"rootElement\"></div>\n");
+  fprintf(geodeb_file, "</body>\n");
+  fprintf(geodeb_file, "<script type=\"text/javascript\">\n");
+  fprintf(geodeb_file, "resourcePath = '%s/';\n", resource_path.c_str());
+  fprintf(geodeb_file, "jsonData = ");
   json_start_object();
   FILE* source_file = fopen(source_filename.c_str(), "rt");
   if (source_file != nullptr) {
