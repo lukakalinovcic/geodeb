@@ -141,14 +141,20 @@ class MovieRoll {
                                   [child.x + child.r, child.y],
                                   [child.x, child.y - child.r],
                                   [child.x, child.y + child.r]];
+                    } else if (child.type == 'line') {
+                        var a = (child.y2 - child.y1);
+                        var b = (child.x1 - child.x2);
+                        var c = - a * child.x1 - b * child.y1;
+                        var x = -(a * c) / (a * a + b * b);
+                        var y = -(b * c) / (a * a + b * b);
+                        points = [[x, y]];
                     }
-                    var b = lastFrame.box;
                     points.forEach(function(p) {
-                        var b = lastFrame.box;
-                        b.minX = Math.min(b.minX, p[0]);
-                        b.maxX = Math.max(b.maxX, p[0]);
-                        b.minY = Math.min(b.minY, p[1]);
-                        b.maxY = Math.max(b.maxY, p[1]);
+                        var box = lastFrame.box;
+                        box.minX = Math.min(box.minX, p[0]);
+                        box.maxX = Math.max(box.maxX, p[0]);
+                        box.minY = Math.min(box.minY, p[1]);
+                        box.maxY = Math.max(box.maxY, p[1]);
                     });
                     
                     child['progress'] = i - 0.5;
