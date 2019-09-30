@@ -5,7 +5,7 @@ geodeb is a small C++ library written with competitive programming usage in mind
 
 Installation
 ------------
-The easiest way to install and use the library is to download and copy the geodeb.h file to the working directory where your source code is. That way you can simply include it as follows: 
+The easiest way to install and use the library is to download and copy the [geodeb.h](https://raw.githubusercontent.com/lukakalinovcic/geodeb/master/lib/geodeb.h) file to the working directory where your source code is. That way you can simply include it as follows: 
 
     #include "geodeb.h"
 

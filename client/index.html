@@ -1,13 +1,28 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <script src="main.js"></script>
-</head>
-<body>
-  <div id="rootElement">
-  </div>
-</body>
-  <script type="text/javascript">
-    init('');
-  </script>
+  <head>
+    <title>Museum of 2d art</title>
+    <style>
+      .cell {
+      display: inline-block;
+      min-width: 200px;
+      text-align: center;
+      width: 500px;
+      border: grey 1px solid;
+      border-radius: 8px;
+      margin: 3px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Welcome to the museum of 2D art made with the geodeb library</h2>
+    
+    <div class='cell'>
+      Convex hull<br>
+      <a href="gallery/hull.html">
+        <img src="gallery/hull.png"></img>	    
+      </a>
+    </div>
+  </body>
 </html>
+
