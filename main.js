@@ -27,10 +27,6 @@ function initDom() {
     var rootElement = document.getElementById('rootElement');
     rootElement.innerHTML = `
 <div class="top-panel">
-  <div class="debug-panel">
-    <input type="file" id="debugFile" title="&nbsp;" style="display:none"/>
-    <button id="selectFile">Select debug file</button>
-  </div>
   <div class="message-panel" id="messagePanel"></div>
   <div class="vertical-bar"></div>
   <div class="frame-panel">
@@ -57,8 +53,6 @@ function initDom() {
 }
 
 function runApp() {
-  var debugFile = document.getElementById('debugFile');
-  var selectFileButton = document.getElementById('selectFile');
   var jumpPrevButton = document.getElementById('jumpPrev');
   var jumpNextButton = document.getElementById('jumpNext');
   var stepPrevButton = document.getElementById('stepPrev');
@@ -76,7 +70,6 @@ function runApp() {
   var H = 0;
   var dark = false;
   var sourceView = new SourceView(sourceBox);
-  var jsonData = null;
   var movieRoll = null;
   var drawStack = []; 
   function restart() {
@@ -87,19 +80,6 @@ function runApp() {
       dark = false;
       resize();
       draw();
-      var jsonStr = localStorage.getItem('current_json_data');
-      if (jsonStr == null) {
-          return;
-      }
-      try {
-          jsonData = JSON.parse(jsonStr);
-      } catch (err) {
-          jsonData = null;
-          console.error(err);
-          localStorage.removeItem('current_json_data');
-          messagePanel.innerHTML = '<span class="error">Error processing debug file.</span>';
-          return;
-      }
       if (jsonData.root) {
           if (jsonData.source_code) {
               sourceView.setSource(jsonData.source_code);
@@ -136,19 +116,7 @@ function runApp() {
           stepNextButton.disabled = frame.next == null;
       }
   }
-  
-  function handleDebugSelect(evt) {
-      var files = evt.target.files;
-      if (files.length != 1) return;
-      var reader = new FileReader();
-      reader.onload = function(e) {
-          localStorage.setItem('current_json_data', e.target.result);
-          debugFile.value = null;
-          restart();
-      };
-      reader.readAsText(files[0]);
-  }
-  
+    
   function resize() {
       W = window.innerWidth;
       H = window.innerHeight - 41;
@@ -427,9 +395,7 @@ function runApp() {
   viewport.addCoordsEventListener(updateCoords);
   window.addEventListener('resize', function() { resize(); draw(); }, false);
   document.addEventListener('keydown', keypress, false);
-  debugFile.addEventListener('change', handleDebugSelect, false);
   gridCheckbox.addEventListener('change', function() { draw(); }, false);
-  selectFileButton.addEventListener('click', function() { debugFile.click(); }, false);
   jumpPrevButton.addEventListener('click', function() { prevFrame(false); }, false);
   stepPrevButton.addEventListener('click', function() { prevFrame(true); }, false);
   stepNextButton.addEventListener('click', function() { nextFrame(true); }, false);

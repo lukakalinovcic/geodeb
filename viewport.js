@@ -29,28 +29,29 @@ class Viewport {
     }
 
     setBox(minX, minY, maxX, maxY, animate) {
-	var W = canvas.width;
-	var H = canvas.height;
-	var dx = maxX - minX + 1;
-	var dy = maxY - minY + 1;
-	var centerX = (minX + maxX) / 2;
-	var centerY = (minY + maxY) / 2;
-	var scale = Math.max(1.05 * dx / W, 1.05 * dy / H);
-	var x0 = centerX - W / 2 * scale;
-	var y0 = centerY - H / 2 * scale;
-	// TODO(kalinov): Check this.
-	var shouldMove = (Math.abs(x0 - this.x0) > 0.001 ||
-			  Math.abs(y0 - this.y0) > 0.001 ||
-			  Math.abs(Math.log(scale) - Math.log(this.scale)) > 0.001);
-	if (shouldMove) {
-	    if (animate) {
-  		this.setViewport(x0, y0, scale);
-	    } else {
-		this.x0 = x0;
-		this.y0 = y0;
-		this.scale = scale;
-	    }
-	}
+        var W = canvas.width;
+        var H = canvas.height;
+        var dx = maxX - minX + 1;
+        var dy = maxY - minY + 1;
+        var centerX = (minX + maxX) / 2;
+        var centerY = (minY + maxY) / 2;
+        var scale = Math.max(1.05 * dx / W, 1.05 * dy / H);
+        var x0 = centerX - W / 2 * scale;
+        var y0 = centerY - H / 2 * scale;
+        // TODO(kalinov): Check the math.
+        var shouldMove = (Math.abs(x0 - this.x0) > 0.001 ||
+                          Math.abs(y0 - this.y0) > 0.001 ||
+                          Math.abs(Math.log(scale) -
+                                   Math.log(this.scale)) > 0.001);
+        if (shouldMove) {
+            if (animate) {
+                this.setViewport(x0, y0, scale);
+            } else {
+                this.x0 = x0;
+                this.y0 = y0;
+                this.scale = scale;
+            }
+        }
     }
 
     setViewport(x0, y0, scale) {
@@ -58,13 +59,15 @@ class Viewport {
         this.startX0 = this.x0;
         this.startY0 = this.y0;
         this.startScale = this.scale;
-        this.targetTime = this.startTime + 1000;
+        this.targetTime = this.startTime + 800;
         this.targetX0 = x0;
         this.targetY0 = y0;
         this.targetScale = scale;
         this.fireDrawEvent();
-        this.state = 'animation';
-        window.setTimeout(this.updateViewport.bind(this), 40);
+        if (this.state != 'animation') {
+            this.state = 'animation';
+            window.setTimeout(this.updateViewport.bind(this), 20);
+        }
     }
 
     updateViewport() {
@@ -81,7 +84,7 @@ class Viewport {
                 this.x0 = f * this.targetX0 + (1 - f) * this.startX0;
                 this.y0 = f * this.targetY0 + (1 - f) * this.startY0; 
                 this.scale = f * this.targetScale + (1 - f) * this.startScale;
-                window.setTimeout(this.updateViewport.bind(this), 40);
+                window.setTimeout(this.updateViewport.bind(this), 20);
             }
             this.fireDrawEvent();
         }
