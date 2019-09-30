@@ -73,7 +73,7 @@ Forces a break point in the visualization. [Example](https://lukakalinovcic.gith
 
     GD_LAYER();
 
-Specifies a layer to draw temporary shapes on. Everything that is drawn in the same scope is removed from the drawing when the scope in which the layer is defined ends. There is an implicit break point just before the shapes are removed. [Example](https://lukakalinovcic.github.io.geodeb/examples/layer.html)
+Specifies a layer to draw temporary shapes on. Everything that is drawn in the same scope is removed from the drawing when the scope in which the layer is defined ends. There is an implicit break point just before the shapes are removed. [Example](https://lukakalinovcic.github.io/geodeb/examples/layer.html)
 
 Extra debug information
 -----------------------
