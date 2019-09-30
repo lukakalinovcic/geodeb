@@ -40,27 +40,27 @@ Draw functions
 
     GD_POINT(x, y, attr);
 
-Draws a point at (x, y). [Example](https://lukakalinovcic.github.io.geodeb/examples/point.html)
+Draws a point at (x, y). [Example](https://lukakalinovcic.github.io/geodeb/examples/point.html)
 
     GD_CIRCLE(x, y, r, attr);
 
-Draws a circle of radius r with a center at (x, y). [Example](https://lukakalinovcic.github.io.geodeb/examples/circle.html)
+Draws a circle of radius r with a center at (x, y). [Example](https://lukakalinovcic.github.io/geodeb/examples/circle.html)
 
     GD_SEGMENT(x1, y1, x2, y2, attr);
 
-Draws a line segment from (x1, y1) to (x2, y2). [Example](https://lukakalinovcic.github.io.geodeb/examples/segment.html)
+Draws a line segment from (x1, y1) to (x2, y2). [Example](https://lukakalinovcic.github.io/geodeb/examples/segment.html)
 
     GD_LINE(x1, y1, x2, y2, attr);
 
-Draws a line through points (x1, y1) and (x2, y2). [Example](https://lukakalinovcic.github.io.geodeb/examples/line.html)
+Draws a line through points (x1, y1) and (x2, y2). [Example](https://lukakalinovcic.github.io/geodeb/examples/line.html)
 
     GD_TRIANGLE(x1, y1, x2, y2, x3, y3, attr);
 
-Draws a triangle at points: (x1, y1), (x2, y2) and (x3, y3). [Example](https://lukakalinovcic.github.io.geodeb/examples/triangle.html)
+Draws a triangle at points: (x1, y1), (x2, y2) and (x3, y3). [Example](https://lukakalinovcic.github.io/geodeb/examples/triangle.html)
 
     GD_RECT(x1, y1, x2, y2, attr);
 
-Draws a rectangle parallel to coordinate axis, specified with two opposing corners: (x1, y1) and (x2, y2). [Example](https://lukakalinovcic.github.io.geodeb/examples/rect.html)
+Draws a rectangle parallel to coordinate axis, specified with two opposing corners: (x1, y1) and (x2, y2). [Example](https://lukakalinovcic.github.io/geodeb/examples/rect.html)
 
 Flow functions
 --------------
@@ -69,7 +69,7 @@ To create animations where the drawing evolves in time, you'll need these functi
 
     GD_PAUSE();
 
-Forces a break point in the visualization. [Example](https://lukakalinovcic.github.io.geodeb/examples/pause.html)
+Forces a break point in the visualization. [Example](https://lukakalinovcic.github.io/geodeb/examples/pause.html)
 
     GD_LAYER();
 
