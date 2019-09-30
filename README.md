@@ -16,9 +16,9 @@ Initialization
 
     GD_INIT(output_html);
 
-Before you call any other function, you have to call GD_INIT to tell the library where to write the output html.
+Before you call any other function, you have to call GD_INIT to tell the library where to write the output html. When the program finishes, open the output HTML file in your favorite browser, and the interactive UI will draw the debug output on the screen.
 
-Optionally, if you won't have internet access, you can provide the path to the local copy of the geodeb/client directory:
+Optionally, if you don't have internet access, you can provide the path to the local copy of the geodeb/client directory that contains the JavaScript code for the interactive UI: 
 
     GD_INIT(output_html, resource_dir);
 
@@ -70,6 +70,8 @@ To create animations where the drawing evolves in time, you'll need these functi
     GD_PAUSE();
 
 Forces a break point in the visualization. [Example](https://lukakalinovcic.github.io/geodeb/examples/pause.html)
+
+While the interactive UI always allows you to debug in smaller steps: instruction by instruction, use the break points to pause at moments in time where it makes logical sense. E.g. after reading and drawing the input data.
 
     GD_LAYER();
 
