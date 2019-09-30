@@ -16,9 +16,6 @@ body {
     margin-right: 8px;
 }
 
-.debug-panel {
-}
-
 .message-panel .error {
     color: red;
 }
