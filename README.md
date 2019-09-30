@@ -33,32 +33,34 @@ You can make the stroke width thicker by adding the "bold" attribute.
 
 You can also combine the two by separating the attributes with a space. For example "red bold" will specify both the stroke color and the bold thickness.
 
+https://lukakalinovcic.github.io/geodeb/).
+
 Draw functions
 --------------
 
     GD_POINT(x, y, attr);
 
-Draws a point at (x, y).
+Draws a point at (x, y). [Example](https://lukakalinovcic.github.io.geodeb/examples/point.html)
 
     GD_CIRCLE(x, y, r, attr);
 
-Draws a circle of radius r with a center at (x, y).
+Draws a circle of radius r with a center at (x, y). [Example](https://lukakalinovcic.github.io.geodeb/examples/circle.html)
 
     GD_SEGMENT(x1, y1, x2, y2, attr);
 
-Draws a line segment from (x1, y1) to (x2, y2).
+Draws a line segment from (x1, y1) to (x2, y2). [Example](https://lukakalinovcic.github.io.geodeb/examples/segment.html)
 
     GD_LINE(x1, y1, x2, y2, attr);
 
-Draws a line through points (x1, y1) and (x2, y2).
+Draws a line through points (x1, y1) and (x2, y2). [Example](https://lukakalinovcic.github.io.geodeb/examples/line.html)
 
     GD_TRIANGLE(x1, y1, x2, y2, x3, y3, attr);
 
-Draws a triangle at points: (x1, y1), (x2, y2) and (x3, y3).
+Draws a triangle at points: (x1, y1), (x2, y2) and (x3, y3). [Example](https://lukakalinovcic.github.io.geodeb/examples/triangle.html)
 
     GD_RECT(x1, y1, x2, y2, attr);
 
-Draws a rectangle parallel to coordinate axis, specified with two opposing corners: (x1, y1) and (x2, y2).
+Draws a rectangle parallel to coordinate axis, specified with two opposing corners: (x1, y1) and (x2, y2). [Example](https://lukakalinovcic.github.io.geodeb/examples/rect.html)
 
 Flow functions
 --------------
@@ -67,11 +69,11 @@ To create animations where the drawing evolves in time, you'll need these functi
 
     GD_PAUSE();
 
-Forces a break point in the visualization.
+Forces a break point in the visualization. [Example](https://lukakalinovcic.github.io.geodeb/examples/pause.html)
 
     GD_LAYER();
 
-Specifies a layer to draw temporary shapes on. Everything that is drawn in the same scope is removed from the drawing when the scope in which the layer is defined ends. There is an implicit break point just before the shapes are removed.
+Specifies a layer to draw temporary shapes on. Everything that is drawn in the same scope is removed from the drawing when the scope in which the layer is defined ends. There is an implicit break point just before the shapes are removed. [Example](https://lukakalinovcic.github.io.geodeb/examples/layer.html)
 
 Extra debug information
 -----------------------
@@ -109,4 +111,11 @@ Sets the number of digits after the decimal points to use in the output. The def
 
     GD_DARK(output_html);
 
-An alternative to GD_INIT that changes the UI theme to the dark mode, and makes the canvas that you draw on black.
+An alternative to GD_INIT that changes the UI theme to the dark mode, and makes the canvas black instead of white.
+
+Museum of 2D art
+----------------
+
+For more examples and some nice visualizations head over to the [museum of 2D art](https://lukakalinovcic.github.io/geodeb/).
+
+If you want to donate a piece of 2D art to the museum, you can find my contact information on GitHub.

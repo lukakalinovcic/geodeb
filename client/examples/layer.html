@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://lukakalinovcic.github.io/geodeb/main.js"></script>
+</head>
+<body>
+  <div id="rootElement"></div>
+</body>
+<script type="text/javascript">
+resourcePath = 'https://lukakalinovcic.github.io/geodeb/';
+jsonData = 
+{
+  "source_code": [
+    "#include \u0022geodeb.h\u0022\u000a",
+    "#include <cmath>\u000a",
+    "\u000a",
+    "int main() {\u000a",
+    "  GD_INIT(\u0022layer.html\u0022);\u000a",
+    "  GD_CIRCLE(0, 0, 100, \u0022lightblue bold\u0022);\u000a",
+    "\u000a",
+    "  for (double angle = 0; angle <= 3.15; angle += 0.05) {\u000a",
+    "    const double x = 100 * cos(angle);\u000a",
+    "    const double y = 100 * sin(angle);\u000a",
+    "    GD_LAYER() << \u0022angle = \u0022 << angle;\u000a",
+    "    GD_SEGMENT(0, 0, x, y, \u0022red\u0022);\u000a",
+    "    GD_CIRCLE(x, y, 3, \u0022blue:lightblue\u0022);\u000a",
+    "  }\u000a",
+    "\u000a",
+    "  return 0;\u000a",
+    "}\u000a"
+  ],
+  "root": {
+    "type": "begin",
+    "line": 5,
+    "children": [
+      {
+        "type": "circ",
+        "line": 6,
+        "x": 0.000000,
+        "y": 0.000000,
+        "r": 100.000000,
+        "attr": "lightblue bold"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 100.000000,
+            "y2": 0.000000,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 100.000000,
+            "y": 0.000000,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 99.875026,
+            "y2": 4.997917,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 99.875026,
+            "y": 4.997917,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.05"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 99.500417,
+            "y2": 9.983342,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 99.500417,
+            "y": 9.983342,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.1"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 98.877108,
+            "y2": 14.943813,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 98.877108,
+            "y": 14.943813,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.15"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 98.006658,
+            "y2": 19.866933,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 98.006658,
+            "y": 19.866933,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.2"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 96.891242,
+            "y2": 24.740396,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 96.891242,
+            "y": 24.740396,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.25"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 95.533649,
+            "y2": 29.552021,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 95.533649,
+            "y": 29.552021,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.3"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 93.937271,
+            "y2": 34.289781,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 93.937271,
+            "y": 34.289781,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.35"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 92.106099,
+            "y2": 38.941834,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 92.106099,
+            "y": 38.941834,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.4"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 90.044710,
+            "y2": 43.496553,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 90.044710,
+            "y": 43.496553,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.45"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 87.758256,
+            "y2": 47.942554,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 87.758256,
+            "y": 47.942554,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.5"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 85.252452,
+            "y2": 52.268723,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 85.252452,
+            "y": 52.268723,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.55"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 82.533561,
+            "y2": 56.464247,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 82.533561,
+            "y": 56.464247,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.6"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 79.608380,
+            "y2": 60.518641,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 79.608380,
+            "y": 60.518641,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.65"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 76.484219,
+            "y2": 64.421769,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 76.484219,
+            "y": 64.421769,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.7"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 73.168887,
+            "y2": 68.163876,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 73.168887,
+            "y": 68.163876,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.75"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 69.670671,
+            "y2": 71.735609,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 69.670671,
+            "y": 71.735609,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.8"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 65.998315,
+            "y2": 75.128041,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 65.998315,
+            "y": 75.128041,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.85"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 62.160997,
+            "y2": 78.332691,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 62.160997,
+            "y": 78.332691,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.9"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 58.168309,
+            "y2": 81.341550,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 58.168309,
+            "y": 81.341550,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 0.95"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 54.030231,
+            "y2": 84.147098,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 54.030231,
+            "y": 84.147098,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 49.757105,
+            "y2": 86.742323,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 49.757105,
+            "y": 86.742323,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.05"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 45.359612,
+            "y2": 89.120736,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 45.359612,
+            "y": 89.120736,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.1"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 40.848744,
+            "y2": 91.276394,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 40.848744,
+            "y": 91.276394,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.15"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 36.235775,
+            "y2": 93.203909,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 36.235775,
+            "y": 93.203909,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.2"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 31.532236,
+            "y2": 94.898462,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 31.532236,
+            "y": 94.898462,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.25"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 26.749883,
+            "y2": 96.355819,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 26.749883,
+            "y": 96.355819,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.3"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 21.900669,
+            "y2": 97.572336,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 21.900669,
+            "y": 97.572336,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.35"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 16.996714,
+            "y2": 98.544973,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 16.996714,
+            "y": 98.544973,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.4"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 12.050277,
+            "y2": 99.271299,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 12.050277,
+            "y": 99.271299,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.45"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 7.073720,
+            "y2": 99.749499,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 7.073720,
+            "y": 99.749499,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.5"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": 2.079483,
+            "y2": 99.978376,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": 2.079483,
+            "y": 99.978376,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.55"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -2.919952,
+            "y2": 99.957360,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -2.919952,
+            "y": 99.957360,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.6"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -7.912089,
+            "y2": 99.686503,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -7.912089,
+            "y": 99.686503,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.65"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -12.884449,
+            "y2": 99.166481,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -12.884449,
+            "y": 99.166481,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.7"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -17.824606,
+            "y2": 98.398595,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -17.824606,
+            "y": 98.398595,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.75"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -22.720209,
+            "y2": 97.384763,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -22.720209,
+            "y": 97.384763,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.8"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -27.559025,
+            "y2": 96.127520,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -27.559025,
+            "y": 96.127520,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.85"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -32.328957,
+            "y2": 94.630009,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -32.328957,
+            "y": 94.630009,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.9"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -37.018083,
+            "y2": 92.895972,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -37.018083,
+            "y": 92.895972,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 1.95"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -41.614684,
+            "y2": 90.929743,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -41.614684,
+            "y": 90.929743,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -46.107269,
+            "y2": 88.736237,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -46.107269,
+            "y": 88.736237,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.05"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -50.484610,
+            "y2": 86.320937,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -50.484610,
+            "y": 86.320937,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.1"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -54.735767,
+            "y2": 83.689879,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -54.735767,
+            "y": 83.689879,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.15"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -58.850112,
+            "y2": 80.849640,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -58.850112,
+            "y": 80.849640,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.2"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -62.817362,
+            "y2": 77.807320,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -62.817362,
+            "y": 77.807320,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.25"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -66.627602,
+            "y2": 74.570521,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -66.627602,
+            "y": 74.570521,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.3"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -70.271308,
+            "y2": 71.147335,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -70.271308,
+            "y": 71.147335,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.35"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -73.739372,
+            "y2": 67.546318,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -73.739372,
+            "y": 67.546318,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.4"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -77.023125,
+            "y2": 63.776470,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -77.023125,
+            "y": 63.776470,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.45"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -80.114362,
+            "y2": 59.847214,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -80.114362,
+            "y": 59.847214,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.5"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -83.005354,
+            "y2": 55.768372,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -83.005354,
+            "y": 55.768372,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.55"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -85.688875,
+            "y2": 51.550137,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -85.688875,
+            "y": 51.550137,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.6"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -88.158220,
+            "y2": 47.203054,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -88.158220,
+            "y": 47.203054,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.65"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -90.407214,
+            "y2": 42.737988,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -90.407214,
+            "y": 42.737988,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.7"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -92.430238,
+            "y2": 38.166099,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -92.430238,
+            "y": 38.166099,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.75"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -94.222234,
+            "y2": 33.498815,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -94.222234,
+            "y": 33.498815,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.8"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -95.778724,
+            "y2": 28.747801,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -95.778724,
+            "y": 28.747801,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.85"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -97.095817,
+            "y2": 23.924933,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -97.095817,
+            "y": 23.924933,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.9"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -98.170220,
+            "y2": 19.042265,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -98.170220,
+            "y": 19.042265,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 2.95"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -98.999250,
+            "y2": 14.112001,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -98.999250,
+            "y": 14.112001,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 3"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -99.580832,
+            "y2": 9.146464,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -99.580832,
+            "y": 9.146464,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 3.05"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -99.913515,
+            "y2": 4.158066,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -99.913515,
+            "y": 4.158066,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 3.1"
+      },
+      {
+        "type": "layer",
+        "line": 11,
+        "children": [
+          {
+            "type": "segment",
+            "line": 12,
+            "x1": 0.000000,
+            "y1": 0.000000,
+            "x2": -99.996466,
+            "y2": -0.840725,
+            "attr": "red"
+          },
+          {
+            "type": "circ",
+            "line": 13,
+            "x": -99.996466,
+            "y": -0.840725,
+            "r": 3.000000,
+            "attr": "blue:lightblue"
+          }
+        ],
+        "label": "angle = 3.15"
+      }
+    ]
+  },
+  "theme": "light"
+};
+init(resourcePath);
+</script>
+</html>

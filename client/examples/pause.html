@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://lukakalinovcic.github.io/geodeb/main.js"></script>
+</head>
+<body>
+  <div id="rootElement"></div>
+</body>
+<script type="text/javascript">
+resourcePath = 'https://lukakalinovcic.github.io/geodeb/';
+jsonData = 
+{
+  "source_code": [
+    "#include \u0022geodeb.h\u0022\u000a",
+    "\u000a",
+    "int main() {\u000a",
+    "  GD_INIT(\u0022pause.html\u0022);\u000a",
+    "  for (int i = 0; i < 20; ++i) {\u000a",
+    "    int x1 = -100 + i * 5;\u000a",
+    "    int y1 = -100 + i * 5;\u000a",
+    "    int x2 = 100 - i * 5;\u000a",
+    "    int y2 = 100 - i * 5;\u000a",
+    "    if (i % 2 == 0) {\u000a",
+    "      GD_RECTANGLE(x1, y1, x2, y2, \u0022red:black bold\u0022);\u000a",
+    "    } else {\u000a",
+    "      GD_RECTANGLE(x1, y1, x2, y2, \u0022red:white bold\u0022);\u000a",
+    "    }\u000a",
+    "    GD_PAUSE() << \u0022i = \u0022 << i;\u000a",
+    "  }\u000a",
+    "  return 0;\u000a",
+    "}\u000a"
+  ],
+  "root": {
+    "type": "begin",
+    "line": 4,
+    "children": [
+      {
+        "type": "rect",
+        "line": 11,
+        "x1": -100.000000,
+        "y1": -100.000000,
+        "x2": 100.000000,
+        "y2": 100.000000,
+        "attr": "red:black bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 0"
+      },
+      {
+        "type": "rect",
+        "line": 13,
+        "x1": -95.000000,
+        "y1": -95.000000,
+        "x2": 95.000000,
+        "y2": 95.000000,
+        "attr": "red:white bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 1"
+      },
+      {
+        "type": "rect",
+        "line": 11,
+        "x1": -90.000000,
+        "y1": -90.000000,
+        "x2": 90.000000,
+        "y2": 90.000000,
+        "attr": "red:black bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 2"
+      },
+      {
+        "type": "rect",
+        "line": 13,
+        "x1": -85.000000,
+        "y1": -85.000000,
+        "x2": 85.000000,
+        "y2": 85.000000,
+        "attr": "red:white bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 3"
+      },
+      {
+        "type": "rect",
+        "line": 11,
+        "x1": -80.000000,
+        "y1": -80.000000,
+        "x2": 80.000000,
+        "y2": 80.000000,
+        "attr": "red:black bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 4"
+      },
+      {
+        "type": "rect",
+        "line": 13,
+        "x1": -75.000000,
+        "y1": -75.000000,
+        "x2": 75.000000,
+        "y2": 75.000000,
+        "attr": "red:white bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 5"
+      },
+      {
+        "type": "rect",
+        "line": 11,
+        "x1": -70.000000,
+        "y1": -70.000000,
+        "x2": 70.000000,
+        "y2": 70.000000,
+        "attr": "red:black bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 6"
+      },
+      {
+        "type": "rect",
+        "line": 13,
+        "x1": -65.000000,
+        "y1": -65.000000,
+        "x2": 65.000000,
+        "y2": 65.000000,
+        "attr": "red:white bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 7"
+      },
+      {
+        "type": "rect",
+        "line": 11,
+        "x1": -60.000000,
+        "y1": -60.000000,
+        "x2": 60.000000,
+        "y2": 60.000000,
+        "attr": "red:black bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 8"
+      },
+      {
+        "type": "rect",
+        "line": 13,
+        "x1": -55.000000,
+        "y1": -55.000000,
+        "x2": 55.000000,
+        "y2": 55.000000,
+        "attr": "red:white bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 9"
+      },
+      {
+        "type": "rect",
+        "line": 11,
+        "x1": -50.000000,
+        "y1": -50.000000,
+        "x2": 50.000000,
+        "y2": 50.000000,
+        "attr": "red:black bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 10"
+      },
+      {
+        "type": "rect",
+        "line": 13,
+        "x1": -45.000000,
+        "y1": -45.000000,
+        "x2": 45.000000,
+        "y2": 45.000000,
+        "attr": "red:white bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 11"
+      },
+      {
+        "type": "rect",
+        "line": 11,
+        "x1": -40.000000,
+        "y1": -40.000000,
+        "x2": 40.000000,
+        "y2": 40.000000,
+        "attr": "red:black bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 12"
+      },
+      {
+        "type": "rect",
+        "line": 13,
+        "x1": -35.000000,
+        "y1": -35.000000,
+        "x2": 35.000000,
+        "y2": 35.000000,
+        "attr": "red:white bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 13"
+      },
+      {
+        "type": "rect",
+        "line": 11,
+        "x1": -30.000000,
+        "y1": -30.000000,
+        "x2": 30.000000,
+        "y2": 30.000000,
+        "attr": "red:black bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 14"
+      },
+      {
+        "type": "rect",
+        "line": 13,
+        "x1": -25.000000,
+        "y1": -25.000000,
+        "x2": 25.000000,
+        "y2": 25.000000,
+        "attr": "red:white bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 15"
+      },
+      {
+        "type": "rect",
+        "line": 11,
+        "x1": -20.000000,
+        "y1": -20.000000,
+        "x2": 20.000000,
+        "y2": 20.000000,
+        "attr": "red:black bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 16"
+      },
+      {
+        "type": "rect",
+        "line": 13,
+        "x1": -15.000000,
+        "y1": -15.000000,
+        "x2": 15.000000,
+        "y2": 15.000000,
+        "attr": "red:white bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 17"
+      },
+      {
+        "type": "rect",
+        "line": 11,
+        "x1": -10.000000,
+        "y1": -10.000000,
+        "x2": 10.000000,
+        "y2": 10.000000,
+        "attr": "red:black bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 18"
+      },
+      {
+        "type": "rect",
+        "line": 13,
+        "x1": -5.000000,
+        "y1": -5.000000,
+        "x2": 5.000000,
+        "y2": 5.000000,
+        "attr": "red:white bold"
+      },
+      {
+        "type": "break",
+        "line": 15,
+        "label": "i = 19"
+      }
+    ]
+  },
+  "theme": "light"
+};
+init(resourcePath);
+</script>
+</html>

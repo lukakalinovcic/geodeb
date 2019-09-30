@@ -63,7 +63,7 @@
 #define GD_RECTANGLE5(x1, y1, x2, y2, attr)             \
   geodeb::Rectangle(x1, y1, x2, y2, attr, __LINE__)
 #define GD_RECTANGLE4(x1, y1, x2, y2)    \
-  GD_RECT5(x1, y1, x2, y2, "")
+  GD_RECTANGLE5(x1, y1, x2, y2, "")
 #define GD_RECTANGLE(...) _GD_VFUNC(GD_RECTANGLE, __VA_ARGS__)
 #define GD_RECT(...) _GD_VFUNC(GD_RECTANGLE, __VA_ARGS__)
 
