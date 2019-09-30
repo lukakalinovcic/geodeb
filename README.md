@@ -91,12 +91,12 @@ In general, it is recommended to draw polylines and polygons using GD_SEGMENT in
     GD_POLYGON(attr,
                code);
 
-The code is an arbitrary C++ code that adds points to the polygon using GD_POLYPOINT(x, y) calls.
+The code argument is an arbitrary block of C++ code that adds points to the polygon using GD_POLYPOINT(x, y) calls. [Example](https://lukakalinovcic.github.io/geodeb/examples/polygon.html)
 
     GD_POLYLINE(attr,
                 code);
 
-Analog functions for drawing polylines.
+An analog function for drawing polylines.
 
 Additional options
 ------------------
@@ -111,7 +111,7 @@ Sets the number of digits after the decimal points to use in the output. The def
 
     GD_DARK(output_html);
 
-An alternative to GD_INIT that changes the UI theme to the dark mode, and makes the canvas black instead of white.
+An alternative to GD_INIT that changes the UI theme to the dark mode, and makes the canvas black instead of white. [Example](https://lukakalinovcic.github.io/geodeb/examples/dark.html)
 
 Museum of 2D art
 ----------------

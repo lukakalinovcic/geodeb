@@ -27,7 +27,7 @@
 #define GD_DARK2(filename, resource_path)       \
   GD_INIT3(filename, resource_path, true)
 #define GD_DARK1(filename)       \
-  GD_DARG2(filename, "https://lukakalinovcic.github.io/geodeb")
+  GD_DARK2(filename, "https://lukakalinovcic.github.io/geodeb")
 #define GD_DARK(...) _GD_VFUNC(GD_DARK, __VA_ARGS__)
 
 #define GD_SET_PRECISION(precision)             \
