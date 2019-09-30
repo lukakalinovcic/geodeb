@@ -58,18 +58,7 @@ function updateLabel(data, line, newLabel) {
 class MovieRoll {
     constructor(root) {
         this.currentFrame = new Frame(null);
-        var progress = {};
-        this.build(root, this.currentFrame, progress, {}, []);
-        // TODO(kalinov): Fix double rainbow.
-        for (var frame = this.currentFrame; frame.next != null;
-             frame = frame.next.next) {
-            var transition = frame.next;
-            transition.actions.forEach(function(action) {
-                if (action.type == 'add') {
-                    action.data.progress /= progress[action.data.line];
-                }
-            });
-        }
+        this.build(root, this.currentFrame, {}, {}, [], []);
     }
 
     appendFrame(lastFrame) {
@@ -82,11 +71,13 @@ class MovieRoll {
         return nextFrame;
     }
 
-    build(node, lastFrame, progress, labels, transitions) {
+    build(node, lastFrame, progress, labels, transitions, unresolvedProgress) {
+        var toResolveProgress = [];
+        var firstFrame = lastFrame;
         if (node.children) {
             node.children.forEach(function(child) {
                 var line = child.line;
-                var i = incrementProgress(progress, line);
+                var item_progress = incrementProgress(progress, line);
                 var newLabel = ('label' in child) ? child.label : '';
                 var oldLabel = updateLabel(labels, line, newLabel);
                 lastFrame = this.appendFrame(lastFrame);
@@ -101,21 +92,25 @@ class MovieRoll {
                 if (child.type == 'layer') {
                     var layerTransitions = [];
                     var startFrame = lastFrame;
-                    lastFrame = this.build(child, lastFrame, progress, labels,
-                                           layerTransitions);
+                    var childUnresolvedProgress = [];
+                    lastFrame = this.build(
+                        child, lastFrame, {}, labels, layerTransitions,
+                        childUnresolvedProgress);
+                    childUnresolvedProgress.forEach(function(add_action) {
+                        var data = add_action.data;
+                        data.progress = incrementProgress(progress, data.line);
+                        toResolveProgress.push(add_action);
+                    });
                     lastFrame.breakpoint = true;
                     lastFrame = this.appendFrame(lastFrame);
-                    lastFrame.box = new Box(startFrame.box);
-                    for (var i = layerTransitions.length - 1; i >= 0; --i) {
-                        var transition = layerTransitions[i];
-                        for (var j = transition.actions.length - 1; j >= 0; --j) {
-                            var action = transition.actions[j];
+                    layerTransitions.slice().reverse().forEach(function(transition) {
+                        transition.actions.slice().reverse().forEach(function(action) {
                             if (action.type == 'add') {
                                 lastFrame.prev.actions.push(
                                     new Action('remove', action.data));
                             }
-                        }
-                    }
+                        });
+                    });
                 } else if (child.type == 'break') {
                     lastFrame.breakpoint = true;
                 } else {
@@ -141,6 +136,12 @@ class MovieRoll {
                                   [child.x + child.r, child.y],
                                   [child.x, child.y - child.r],
                                   [child.x, child.y + child.r]];
+                    } else if (child.type == 'arc') {
+                        points = [[child.x, child.y],
+                                  [child.x + child.r * Math.cos(child.sAngle),
+                                   child.y + child.r * Math.sin(child.sAngle)],
+                                  [child.x + child.r * Math.cos(child.eAngle),
+                                   child.y + child.r * Math.sin(child.eAngle)]];
                     } else if (child.type == 'line') {
                         var a = (child.y2 - child.y1);
                         var b = (child.x1 - child.x2);
@@ -157,12 +158,22 @@ class MovieRoll {
                         box.maxY = Math.max(box.maxY, p[1]);
                     });
                     
-                    child['progress'] = i - 0.5;
-                    transition.actions.push(new Action('add', child));
+                    child['progress'] = item_progress - 0.5;
+                    var add_action = new Action('add', child);
+                    transition.actions.push(add_action);
                     transitions.push(transition);
+                    toResolveProgress.push(add_action);
                 }
             }.bind(this));
         }
+
+        toResolveProgress.forEach(function(add_action) {
+            if (progress[add_action.data.line] == 1) {
+                unresolvedProgress.push(add_action);
+            } else {
+                add_action.data.progress /= progress[add_action.data.line];
+            }
+        });
         return lastFrame;
     }
 }
