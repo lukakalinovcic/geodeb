@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://lukakalinovcic.github.io/geodeb/main.js"></script>
+</head>
+<body>
+  <div id="rootElement"></div>
+</body>
+<script type="text/javascript">
+resourcePath = 'https://lukakalinovcic.github.io/geodeb/';
+jsonData = 
+{
+  "source_code": [
+    "#include \u0022geodeb.h\u0022\u000a",
+    "\u000a",
+    "int main() {\u000a",
+    "  GD_INIT(\u0022point.html\u0022);\u000a",
+    "  GD_POINT(3, 3);\u000a",
+    "  GD_POINT(-3, 3, \u0022red\u0022);\u000a",
+    "  GD_POINT(-3, -3, \u0022blue\u0022);\u000a",
+    "  GD_POINT(3, -3, \u0022bold\u0022);\u000a",
+    "  GD_POINT(0.5, 1.4, \u0022green bold\u0022);\u000a",
+    "  return 0;\u000a",
+    "}\u000a"
+  ],
+  "root": {
+    "type": "begin",
+    "line": 4,
+    "children": [
+      {
+        "type": "point",
+        "line": 5,
+        "x": 3.000000,
+        "y": 3.000000
+      },
+      {
+        "type": "point",
+        "line": 6,
+        "x": -3.000000,
+        "y": 3.000000,
+        "attr": "red"
+      },
+      {
+        "type": "point",
+        "line": 7,
+        "x": -3.000000,
+        "y": -3.000000,
+        "attr": "blue"
+      },
+      {
+        "type": "point",
+        "line": 8,
+        "x": 3.000000,
+        "y": -3.000000,
+        "attr": "bold"
+      },
+      {
+        "type": "point",
+        "line": 9,
+        "x": 0.500000,
+        "y": 1.400000,
+        "attr": "green bold"
+      }
+    ]
+  },
+  "theme": "light"
+};
+init(resourcePath);
+</script>
+</html>
