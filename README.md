@@ -33,8 +33,6 @@ You can make the stroke width thicker by adding the "bold" attribute.
 
 You can also combine the two by separating the attributes with a space. For example "red bold" will specify both the stroke color and the bold thickness.
 
-https://lukakalinovcic.github.io/geodeb/).
-
 Draw functions
 --------------
 
