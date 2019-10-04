@@ -86,6 +86,12 @@
   GD_ARC6(x, y, r, sAngle, eAngle, "")
 #define GD_ARC(...) _GD_VFUNC(GD_ARC, __VA_ARGS__)
 
+#define GD_PIE6(x, y, r, sAngle, eAngle, attr)          \
+  geodeb::Pie(x, y, r, sAngle, eAngle, attr, __LINE__)
+#define GD_PIE5(x, y, r, sAngle, eAngle)        \
+  GD_PIE6(x, y, r, sAngle, eAngle, "")
+#define GD_PIE(...) _GD_VFUNC(GD_PIE, __VA_ARGS__)
+
 #define GD_POLYGON2(attr, code)                                 \
   { geodeb::PolyBuilder poly(attr, true, __LINE__); code } 0
 #define GD_POLYGON1(code)                       \
@@ -343,6 +349,22 @@ class Arc : public OperationWithLogging {
   Arc(double x, double y, double r, double sAngle, double eAngle,
       const std::string& attr, int line)
       : OperationWithLogging("arc", line, {x, y, r, sAngle, eAngle}) {
+    json_print_double("x", x);
+    json_print_double("y", y);
+    json_print_double("r", r);
+    json_print_double("sAngle", sAngle);
+    json_print_double("eAngle", eAngle);
+    if (!attr.empty()) {
+      json_print_string("attr", attr);
+    }
+  }
+};
+
+class Pie : public OperationWithLogging {
+ public:
+  Pie(double x, double y, double r, double sAngle, double eAngle,
+      const std::string& attr, int line)
+      : OperationWithLogging("pie", line, {x, y, r, sAngle, eAngle}) {
     json_print_double("x", x);
     json_print_double("y", y);
     json_print_double("r", r);

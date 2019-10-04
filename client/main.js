@@ -236,14 +236,18 @@ function runApp() {
                   ctx.fill();
               }
               ctx.stroke();
-          } else if (item.type == 'arc') {
+          } else if (item.type == 'arc' || item.type == 'pie') {
               ctx.beginPath();
-              var centerX = canvasX(0);
-              var centerY = canvasY(0);
-              ctx.moveTo(centerX, centerY);
-              ctx.arc(canvasX(item.x), canvasY(item.y), item.r / viewport.scale,
+              var centerX = canvasX(item.x);
+              var centerY = canvasY(item.y);
+              if (item.type == 'pie') {
+                  ctx.moveTo(centerX, centerY);
+              }
+              ctx.arc(centerX, centerY, item.r / viewport.scale,
                       -item.eAngle, -item.sAngle, false);
-              ctx.lineTo(centerX, centerY);
+              if (item.type == 'pie') {
+                  ctx.lineTo(centerX, centerY);
+              }
               if (hasFill) {
                   ctx.fill();
               }

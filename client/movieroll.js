@@ -136,7 +136,7 @@ class MovieRoll {
                                   [child.x + child.r, child.y],
                                   [child.x, child.y - child.r],
                                   [child.x, child.y + child.r]];
-                    } else if (child.type == 'arc') {
+                    } else if (child.type == 'arc' || child.type == 'pie') {
                         points = [[child.x, child.y],
                                   [child.x + child.r * Math.cos(child.sAngle),
                                    child.y + child.r * Math.sin(child.sAngle)],
