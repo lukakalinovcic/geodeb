@@ -60,6 +60,11 @@ Draws a triangle at points: (x1, y1), (x2, y2) and (x3, y3). [Example](https://l
 
 Draws a rectangle parallel to coordinate axis, specified with two opposing corners: (x1, y1) and (x2, y2). [Example](https://lukakalinovcic.github.io/geodeb/examples/rect.html)
 
+    GD_ARC(x, y, r, start_angle, end_angle, attr);
+    GD_PIE(x, y, r, start_angle, end_angle, attr);
+
+Draws an arc of a circle of radius r with a center at (x, y). An arc is drawn from start_angle to end_angle (given in radians) in a counter-clockwise direction. GD_PIE variant also draws the two segments from the center to the two endpoints on the circle.
+
 Flow functions
 --------------
 
