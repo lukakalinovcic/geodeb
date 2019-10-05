@@ -61,7 +61,7 @@ class SourceView {
               }(span), 1000);
             }
         }
-        this.scrollIntoView(span);
+        this.scrollLineIntoView(span);
     }
     
     highlight(line, commandName, className) {
@@ -76,16 +76,18 @@ class SourceView {
             window.setTimeout(function(span) {
                 return function() { span.classList.remove(className); }
             }(span), 1000);
-            this.scrollIntoView(span);
+            this.scrollLineIntoView(span);
         }
     }
 
-    scrollIntoView(element) {
+    scrollLineIntoView(element) {
         var outer = sourceElement.getBoundingClientRect();
         var inner = element.getBoundingClientRect();
         if (inner.top < outer.top) {
             element.scrollIntoView(true);
         }
+        element = element.childNodes[0];
+        var inner = element.getBoundingClientRect();
         if (inner.bottom > outer.bottom) {
             element.scrollIntoView(false);
         }
