@@ -39,6 +39,7 @@ function initDom() {
     <button id="jumpPrev">&#8676;</button>
     <button class='step' id="stepPrev">&#8672;</button>
     <div id="fpsGauge"></div>
+    <div id="buttonSeparator"></div>
     <button class='step' id="stepNext">&#8674;</button>
     <button id="jumpNext">&#8677;</button>
     <button class='speed' id="faster">Speed up</button>
@@ -69,6 +70,7 @@ function runApp() {
     var jumpNextButton = document.getElementById('jumpNext');
     var stepPrevButton = document.getElementById('stepPrev');
     var stepNextButton = document.getElementById('stepNext');
+    var buttonSeparator = document.getElementById('buttonSeparator');
     var coordsPanel = document.getElementById('coordsPanel');
     var gridCheckbox = document.getElementById('gridCheckbox');
     var freeCameraCheckbox = document.getElementById('freeCameraCheckbox');
@@ -94,10 +96,10 @@ function runApp() {
         movieRoll = null;
         drawStack = [];
         dark = false;
-	autoPlay = false;
-	autoPlayFps = 3;
-	autoPlayForward = true;
-	updateFpsGauge();
+        autoPlay = false;
+        autoPlayFps = 3;
+        autoPlayForward = true;
+        updateFpsGauge();
         resize();
         updateControls();
         draw();
@@ -131,13 +133,15 @@ function runApp() {
         jumpNextButton.style.display = autoPlay ? 'none' : 'inline-block';
         stepPrevButton.style.display = autoPlay ? 'none' : 'inline-block';
         stepNextButton.style.display = autoPlay ? 'none' : 'inline-block';
-	slowerButton.style.display = autoPlay ? 'inline-block' : 'none';
-	fasterButton.style.display = autoPlay ? 'inline-block' : 'none';
+        slowerButton.style.display = autoPlay ? 'inline-block' : 'none';
+        fasterButton.style.display = autoPlay ? 'inline-block' : 'none';
+        fpsGauge.style.display = autoPlay ? 'inline-block' : 'none';
+        buttonSeparator.style.display = autoPlay ? 'none' : 'inline-block'
         if (movieRoll == null) {
             playButton.disabled = true;
             pauseButton.disabled = true;
-	    slowerButton.disabled = true;
-	    fasterButton.disabled = true;
+            slowerButton.disabled = true;
+            fasterButton.disabled = true;
             jumpPrevButton.disabled = true;
             jumpNextButton.disabled = true;
             stepPrevButton.disabled = true;
@@ -145,8 +149,8 @@ function runApp() {
         } else {
             playButton.disabled = false;
             pauseButton.disabled = false;
-	    slowerButton.disabled = false;
-	    fasterButton.disabled = false;
+            slowerButton.disabled = false;
+            fasterButton.disabled = false;
             var frame = movieRoll.currentFrame;
             jumpPrevButton.disabled = frame.prev == null;
             jumpNextButton.disabled = frame.next == null;
@@ -363,7 +367,7 @@ function runApp() {
 
     function nextFrame(step) {
         if (movieRoll == null) return false;
-	if (movieRoll.currentFrame.next == null) return false;
+  if (movieRoll.currentFrame.next == null) return false;
         for (;;) {
             var transition = movieRoll.currentFrame.next;
             if (transition == null) break;
@@ -387,12 +391,12 @@ function runApp() {
         }
         updateControls();
         draw();
-	return true;
+  return true;
     }
     
     function prevFrame(step) {
         if (movieRoll == null) return false;
-	if (movieRoll.currentFrame.prev == null) return false;
+  if (movieRoll.currentFrame.prev == null) return false;
         for (;;) {
             var transition = movieRoll.currentFrame.prev;
             if (transition == null) break;
@@ -416,22 +420,22 @@ function runApp() {
         }
         updateControls();
         draw();
-	return true;
+  return true;
     }
 
     function doAutoPlay() {
-	if (autoPlay) {
-	    if (autoPlayForward) {
-  		if (!nextFrame()) {
-		    autoPlayForward = false;
-		}
-	    } else {
-		if (!prevFrame()) {
-		    autoPlayForward = true;
-		}
-	    }
-	    window.setTimeout(doAutoPlay, 1000 / autoPlayFps);
-	}
+  if (autoPlay) {
+      if (autoPlayForward) {
+      if (!nextFrame()) {
+        autoPlayForward = false;
+    }
+      } else {
+    if (!prevFrame()) {
+        autoPlayForward = true;
+    }
+      }
+      window.setTimeout(doAutoPlay, 1000 / autoPlayFps);
+  }
     }
     
     function keypress(e) {
@@ -445,7 +449,7 @@ function runApp() {
             nextFrame(true);
         }
     }
-    
+
     function updateCoords() {
         if (viewport.coordsX == null || viewport.coordsY == null) {
             coordsPanel.innerHTML = '';
@@ -459,11 +463,13 @@ function runApp() {
     }
 
     function updateFpsGauge() {
-	if (autoPlay) {
-	    fpsGauge.innerHTML = autoPlayFps;
-	} else {
-	    fpsGauge.innerHTML = '';
-	}
+        if (autoPlay) {
+            var digits = Math.max(0,
+                                  -Math.floor(Math.log10(autoPlayFps)));
+            fpsGauge.innerHTML = 'FPS: ' + autoPlayFps.toFixed(digits);
+        } else {
+            fpsGauge.innerHTML = '';
+        }
     }
     
     restart();
@@ -479,23 +485,23 @@ function runApp() {
     jumpNextButton.addEventListener('click', function() { nextFrame(false); }, false);
     playButton.addEventListener('click', function() {
         autoPlay = true;
-	window.setTimeout(doAutoPlay, 1000 / autoPlayFps);
-	updateFpsGauge();
+        window.setTimeout(doAutoPlay, 1000 / autoPlayFps);
+        updateFpsGauge();
         updateControls();
     }, false);
     pauseButton.addEventListener('click', function() {
         autoPlay = false;
-	updateFpsGauge();
+        updateFpsGauge();
         updateControls();
     }, false);
     slowerButton.addEventListener('click', function() {
         var roundAt = Math.pow(10, Math.floor(Math.log10(autoPlayFps)));
-	autoPlayFps = (autoPlayFps / 1.5 / roundAt).toFixed(1) * roundAt; 
-	updateFpsGauge();
+        autoPlayFps = Math.max(0.1, (autoPlayFps / 1.5 / roundAt).toFixed(1) * roundAt); 
+        updateFpsGauge();
     }, false);
     fasterButton.addEventListener('click', function() {
         var roundAt = Math.pow(10, Math.floor(Math.log10(autoPlayFps)));
-	autoPlayFps = (autoPlayFps * 1.5 / roundAt).toFixed(1) * roundAt; 
-	updateFpsGauge();
+        autoPlayFps = Math.min(500, (autoPlayFps * 1.5 / roundAt).toFixed(1) * roundAt); 
+        updateFpsGauge();
     }, false);
 }
