@@ -34,13 +34,16 @@ body {
     width: 30px;
 }
 .frame-panel button.speed {
-    width: 98px;
+    width: 83px;
 }
 
 .frame-panel #fpsGauge {
-    width: 32px;
-    display: inline-block;
+    width: 62px;
     text-align: center;
+}
+
+.frame-panel #buttonSeparator {
+    width: 32px;
 }
 
 .coords-panel {
