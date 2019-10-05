@@ -158,6 +158,28 @@ function runApp() {
             stepNextButton.disabled = frame.next == null;
         }
     }
+
+    function updateCamera() {
+        if (movieRoll == null) return;
+        if (freeCameraCheckbox.checked) return;
+        var b = movieRoll.currentFrame.box;
+        viewport.setBox(b.minX, b.minY, b.maxX, b.maxY, true);
+    }
+
+    function doAutoPlay() {
+        if (autoPlay) {
+            if (autoPlayForward) {
+                if (!nextFrame()) {
+                    autoPlayForward = false;
+                }
+            } else {
+                if (!prevFrame()) {
+                    autoPlayForward = true;
+                }
+            }
+            window.setTimeout(doAutoPlay, 1000 / autoPlayFps);
+        }
+    }
     
     function resize() {
         W = window.innerWidth;
@@ -166,8 +188,10 @@ function runApp() {
         var actualWidth = Math.min(targetWidth, Math.floor(W / 2));
         sourceElement.style.height = H + 'px';
         sourceElement.style.width = actualWidth + 'px';
-        canvas.width = W - actualWidth;
+        W -= actualWidth;
+        canvas.width = W;
         canvas.height = H;
+        updateCamera();
     }
     
     
@@ -367,7 +391,7 @@ function runApp() {
 
     function nextFrame(step) {
         if (movieRoll == null) return false;
-  if (movieRoll.currentFrame.next == null) return false;
+        if (movieRoll.currentFrame.next == null) return false;
         for (;;) {
             var transition = movieRoll.currentFrame.next;
             if (transition == null) break;
@@ -389,14 +413,15 @@ function runApp() {
             var b = movieRoll.currentFrame.box;
             viewport.setBox(b.minX, b.minY, b.maxX, b.maxY, true);
         }
+        updateCamera();
         updateControls();
         draw();
-  return true;
+        return true;
     }
     
     function prevFrame(step) {
         if (movieRoll == null) return false;
-  if (movieRoll.currentFrame.prev == null) return false;
+        if (movieRoll.currentFrame.prev == null) return false;
         for (;;) {
             var transition = movieRoll.currentFrame.prev;
             if (transition == null) break;
@@ -414,28 +439,10 @@ function runApp() {
             movieRoll.currentFrame = transition.prev;
             if (step || movieRoll.currentFrame.breakpoint) break;
         }
-        if (!freeCameraCheckbox.checked) {
-            var b = movieRoll.currentFrame.box;
-            viewport.setBox(b.minX, b.minY, b.maxX, b.maxY, true);
-        }
+        updateCamera();
         updateControls();
         draw();
-  return true;
-    }
-
-    function doAutoPlay() {
-  if (autoPlay) {
-      if (autoPlayForward) {
-      if (!nextFrame()) {
-        autoPlayForward = false;
-    }
-      } else {
-    if (!prevFrame()) {
-        autoPlayForward = true;
-    }
-      }
-      window.setTimeout(doAutoPlay, 1000 / autoPlayFps);
-  }
+        return true;
     }
     
     function keypress(e) {
