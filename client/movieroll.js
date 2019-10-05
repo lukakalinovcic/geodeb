@@ -143,12 +143,22 @@ class MovieRoll {
                                   [child.x + child.r * Math.cos(child.eAngle),
                                    child.y + child.r * Math.sin(child.eAngle)]];
                     } else if (child.type == 'line') {
+                        var box = lastFrame.box;
                         var a = (child.y2 - child.y1);
                         var b = (child.x1 - child.x2);
                         var c = - a * child.x1 - b * child.y1;
-                        var x = -(a * c) / (a * a + b * b);
-                        var y = -(b * c) / (a * a + b * b);
-                        points = [[x, y]];
+                        var visible = false;
+                        visible |= ((a * box.minX + b * box.minY + c < 0) ^
+                                    (a * box.maxX + b * box.maxY + c < 0)); 
+                        visible |= ((a * box.minX + b * box.maxY + c < 0) ^
+                                    (a * box.maxX + b * box.minY + c < 0));
+                        if (!visible) {
+                            var x = -(a * c) / (a * a + b * b);
+                            var y = -(b * c) / (a * a + b * b);
+                            points = [[x, y]];
+                        } else {
+                            points = [];
+                        }
                     }
                     points.forEach(function(p) {
                         var box = lastFrame.box;
