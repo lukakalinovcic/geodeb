@@ -23,14 +23,24 @@ body {
     color: green;
 }
 
+.animation-panel button {
+    width: 64px;
+}
+
 .frame-panel button {
     width: 64px;
 }
 .frame-panel button.step {
     width: 30px;
 }
-.frame-panel .tmp {
-    margin-left: 32px;
+.frame-panel button.speed {
+    width: 98px;
+}
+
+.frame-panel #fpsGauge {
+    width: 32px;
+    display: inline-block;
+    text-align: center;
 }
 
 .coords-panel {
