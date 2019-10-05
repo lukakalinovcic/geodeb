@@ -40,10 +40,12 @@ body {
 .frame-panel #fpsGauge {
     width: 62px;
     text-align: center;
+    display: inline-block;
 }
 
 .frame-panel #buttonSeparator {
     width: 32px;
+    display: inline-block;
 }
 
 .coords-panel {
