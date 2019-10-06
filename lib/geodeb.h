@@ -1,5 +1,6 @@
 #include <cassert>
 #include <cstdarg>
+#include <cstdio>
 #include <cstdlib>
 #include <iomanip>
 #include <sstream>
@@ -91,7 +92,7 @@ void json_print_int(const std::string& key, int val) {
 }
 void json_print_double(const std::string& key, double val) {
   static char format[64];
-  sprintf(format, "\"%%s\": %%.%dlf", geodeb::precision);
+  sprintf(format, "\"%%s\": %%.%df", geodeb::precision);
   json_println(format, key.c_str(), val);
 }
 void json_start_array(const std::string& key) {
@@ -168,7 +169,7 @@ class OperationWithLogging : public Operation {
     if (geodeb::log_to_stderr) {
       log_prefix(line_);
       static char format[64];
-      sprintf(format, "%%.%dlf", geodeb::precision);
+      sprintf(format, "%%.%df", geodeb::precision);
       fprintf(stderr, "%s(", type.c_str());
       for (int i = 0; i < args.size(); ++i) {
         if (i > 0) fprintf(stderr, ", ");
@@ -357,11 +358,11 @@ class PolyBuilder : public OperationWithLogging {
 
   void Add(double x, double y, int line) {
     static char format[64];
-    sprintf(format, "[%%.%dlf, %%.%dlf]",
+    sprintf(format, "[%%.%df, %%.%df]",
             geodeb::precision, geodeb::precision);
     json_println(format, x, y);
     if (geodeb::log_to_stderr) {
-      sprintf(format, "(%%.%dlf, %%.%dlf)\n",
+      sprintf(format, "(%%.%df, %%.%df)\n",
               geodeb::precision, geodeb::precision);
       log_prefix(line);
       fprintf(stderr, format, x, y);
