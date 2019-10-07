@@ -171,7 +171,7 @@ class OperationWithLogging : public Operation {
       static char format[64];
       sprintf(format, "%%.%df", geodeb::precision);
       fprintf(stderr, "%s(", type.c_str());
-      for (int i = 0; i < args.size(); ++i) {
+      for (size_t i = 0; i < args.size(); ++i) {
         if (i > 0) fprintf(stderr, ", ");
         fprintf(stderr, format, args[i]);
       }
@@ -216,6 +216,9 @@ class Breakpoint : public OperationWithLogging {
 
 class Point : public OperationWithLogging {
  public:
+  template<typename T>
+  Point(int line, const T& p1, const std::string& attr=kEmpty) :
+      Point(line, p1.x, p1.y, attr) {}
   Point(int line, double x, double y, const std::string& attr=kEmpty) :
       OperationWithLogging("point", line, {x, y}) {
     json_print_double("x", x);
@@ -228,6 +231,9 @@ class Point : public OperationWithLogging {
 
 class Segment : public OperationWithLogging {
  public:
+  template<typename T>
+  Segment(int line, const T& p1, const T& p2, const std::string& attr=kEmpty) :
+      Segment(line, p1.x, p1.y, p2.x, p2.y, attr) {}
   Segment(int line,
           double x1, double y1,
           double x2, double y2,
@@ -245,6 +251,9 @@ class Segment : public OperationWithLogging {
 
 class Triangle : public OperationWithLogging {
  public:
+  template<typename T>
+  Triangle(int line, const T& p1, const T& p2, const T& p3, const std::string& attr=kEmpty) :
+      Triangle(line, p1.x, p1.y, p2.x, p2.y, p3.x, p3.y, attr) {}
   Triangle(int line,
            double x1, double y1,
            double x2, double y2,
@@ -265,6 +274,9 @@ class Triangle : public OperationWithLogging {
 
 class Rectangle : public OperationWithLogging {
  public:
+  template<typename T>
+  Rectangle(int line, const T& p1, const T& p2, const std::string& attr=kEmpty) :
+      Rectangle(line, p1.x, p1.y, p2.x, p2.y, attr) {}
   Rectangle(int line,
             double x1, double y1,
             double x2, double y2,
@@ -282,6 +294,9 @@ class Rectangle : public OperationWithLogging {
 
 class Circle : public OperationWithLogging {
  public:
+  template<typename T>
+  Circle(int line, const T& p1, double r, const std::string& attr=kEmpty) :
+      Circle(line, p1.x, p1.y, r, attr) {}
   Circle(int line, double x, double y, double r,
          const std::string& attr=kEmpty)
       : OperationWithLogging("circ", line, {x, y, r}) {
@@ -296,6 +311,10 @@ class Circle : public OperationWithLogging {
 
 class Arc : public OperationWithLogging {
  public:
+  template<typename T>
+  Arc(int line, const T& p1, double r, double sAngle, double eAngle,
+      const std::string& attr=kEmpty) :
+      Arc(line, p1.x, p1.y, r, sAngle, eAngle, attr) {}
   Arc(int line, double x, double y, double r, double sAngle, double eAngle,
       const std::string& attr=kEmpty)
       : OperationWithLogging("arc", line, {x, y, r, sAngle, eAngle}) {
@@ -312,6 +331,10 @@ class Arc : public OperationWithLogging {
 
 class Pie : public OperationWithLogging {
  public:
+  template<typename T>
+  Pie(int line, const T& p1, double r, double sAngle, double eAngle,
+      const std::string& attr=kEmpty) :
+      Pie(line, p1.x, p1.y, r, sAngle, eAngle, attr) {}
   Pie(int line, double x, double y, double r, double sAngle, double eAngle,
       const std::string& attr=kEmpty)
       : OperationWithLogging("pie", line, {x, y, r, sAngle, eAngle}) {
@@ -328,6 +351,9 @@ class Pie : public OperationWithLogging {
 
 class Line : public OperationWithLogging {
  public:
+  template<typename T>
+  Line(int line, const T& p1, const T& p2, const std::string& attr=kEmpty) :
+      Line(line, p1.x, p1.y, p2.x, p2.y, attr) {}
   Line(int line, double x1, double y1, double x2, double y2,
        const std::string& attr=kEmpty)
       : OperationWithLogging("line", line, {x1, y1, x2, y2}) {
