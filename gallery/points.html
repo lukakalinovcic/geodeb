@@ -1,0 +1,3546 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://lukakalinovcic.github.io/geodeb/main.js"></script>
+</head>
+<body>
+  <div id="rootElement"></div>
+</body>
+<script type="text/javascript">
+resourcePath = 'https://lukakalinovcic.github.io/geodeb/';
+jsonData = 
+{
+  "source_code": [
+    "#include \u0022geodeb.h\u0022\u000a",
+    "\u000a",
+    "#include <algorithm>\u000a",
+    "#include <array>\u000a",
+    "#include <cassert>\u000a",
+    "#include <iostream>\u000a",
+    "#include <vector>\u000a",
+    "\u000a",
+    "typedef std::array<int, 2> Point;\u000a",
+    "\u000a",
+    "template <class T> T next() {\u000a",
+    "    T res;\u000a",
+    "    std::cin >> res;\u000a",
+    "    return res;\u000a",
+    "}\u000a",
+    "\u000a",
+    "inline int64_t getArea(Point p1, Point p2, Point p3) {\u000a",
+    "    int64_t dx1 = p2[0] - p1[0];\u000a",
+    "    int64_t dy1 = p2[1] - p1[1];\u000a",
+    "    int64_t dx2 = p3[0] - p1[0];\u000a",
+    "    int64_t dy2 = p3[1] - p1[1];\u000a",
+    "    int64_t res = dx1 * dy2 - dy1 * dx2;\u000a",
+    "    if (res < 0) res = -res;\u000a",
+    "    return res;\u000a",
+    "}\u000a",
+    "\u000a",
+    "inline bool isInside(std::array<Point, 3> triangle, Point p) {\u000a",
+    "    int64_t area = getArea(triangle[0], triangle[1], triangle[2]);\u000a",
+    "    for (int index = 0; index < triangle.size(); ++index) {\u000a",
+    "        area -= getArea(triangle[index], triangle[(index + 1) % triangle.size()], p);\u000a",
+    "    }\u000a",
+    "    assert(area <= 0);\u000a",
+    "    return area == 0;\u000a",
+    "}\u000a",
+    "\u000a",
+    "class Task {\u000a",
+    "public:\u000a",
+    "    void report(int u, int v, int color, std::array<std::vector<Point>, 2> &inputPoints) {\u000a",
+    "        assert(color == 0 || color == 1);\u000a",
+    "        char code = (color == 0) ? 'g' : 'r';\u000a",
+    "        std::cout << u + 1 << \u0022 \u0022 << v + 1 << \u0022 \u0022 << code << std::endl;\u000a",
+    "        GD_SEGMENT(\u000a",
+    "            inputPoints[color][u][0], inputPoints[color][u][1],\u000a",
+    "            inputPoints[color][v][0], inputPoints[color][v][1],\u000a",
+    "            (color == 0) ? \u0022green thick\u0022 : \u0022red thick\u0022) << \u0022Connecting \u0022 << ((color == 0) ? \u0022green\u0022 : \u0022red\u0022) << \u0022!\u0022;\u000a",
+    "        GD_PAUSE();\u000a",
+    "    }\u000a",
+    "\u000a",
+    "    void describe() {\u000a",
+    "        std::cerr << \u0022Solving a subtask!\u0022 << std::endl;\u000a",
+    "        for (int i = 0; i < corner.size(); ++i) {\u000a",
+    "            char code = (cornerColor[i] == 0) ? 'g' : 'r';\u000a",
+    "            std::cerr << \u0022(\u0022 << corner[i] + 1 << \u0022, color = \u0022 << code << \u0022), \u0022;\u000a",
+    "        }\u000a",
+    "        std::cerr << std::endl;\u000a",
+    "        for (int color = 0; color < orderedByX.size(); ++color) {\u000a",
+    "            std::cerr << \u0022Number of points of color \u0022 << color\u000a",
+    "                << \u0022 = \u0022 << orderedByX[color].size() << \u0022: { \u0022;\u000a",
+    "            for (auto index : orderedByX[color])\u000a",
+    "                std::cerr << index + 1 << \u0022, \u0022 ;\u000a",
+    "            std::cerr << \u0022}\u0022 << std::endl;\u000a",
+    "        }\u000a",
+    "    }\u000a",
+    "\u000a",
+    "    void doit(std::array<std::vector<Point>, 2> &inputPoints, int depth,\u000a",
+    "            std::vector<std::array<Point, 3>> &triangles) {\u000a",
+    "        for (int i = 0; i < corner.size(); ++i)\u000a",
+    "            assert(cornerColor[i] == 0 || cornerColor[i] == 1);\u000a",
+    "        const int colorSum = cornerColor[0] + cornerColor[1] + cornerColor[2];\u000a",
+    "        assert(colorSum == 1 || colorSum == 2);\u000a",
+    "        if (orderedByX[0].empty() && orderedByX[1].empty()) {\u000a",
+    "            GD_PAUSE() << \u0022The active triangle is empty!\u0022;\u000a",
+    "            return;\u000a",
+    "        } else if (orderedByX[0].empty() || orderedByX[1].empty()) {\u000a",
+    "            GD_PAUSE() << \u0022All points inside the active triangle are the same color!\u0022;\u000a",
+    "            int color = 0;\u000a",
+    "            while (orderedByX[color].empty()) color++;\u000a",
+    "            int cornerIndex = 0;\u000a",
+    "            while (cornerColor[cornerIndex] != color) ++cornerIndex;\u000a",
+    "            for (auto index : orderedByX[color]) \u000a",
+    "                report(corner[cornerIndex], index, color, inputPoints);\u000a",
+    "        } else {\u000a",
+    "            const int colorChoice = (colorSum == 1) ? 1 : 0;\u000a",
+    "            assert(orderedByX[colorChoice].size() == orderedByY[colorChoice].size());\u000a",
+    "            auto &order = (depth % 2 == 0) ? orderedByX[colorChoice] : orderedByY[colorChoice];\u000a",
+    "            const int center = order[order.size() / 2];\u000a",
+    "            int cornerIndex = 0;\u000a",
+    "            while (cornerColor[cornerIndex] != colorChoice) ++cornerIndex;\u000a",
+    "            report(center, corner[cornerIndex], colorChoice, inputPoints);\u000a",
+    "\u000a",
+    "            auto subtasks = std::array<Task, 3>();\u000a",
+    "            for (int i = 0; i < subtasks.size(); ++i) {\u000a",
+    "                subtasks[i].corner[0] = corner[i];\u000a",
+    "                subtasks[i].cornerColor[0] = cornerColor[i];\u000a",
+    "                subtasks[i].corner[1] = corner[(i + 1) % 3];\u000a",
+    "                subtasks[i].cornerColor[1] = cornerColor[(i + 1) % 3];\u000a",
+    "                subtasks[i].corner[2] = center;\u000a",
+    "                subtasks[i].cornerColor[2] = colorChoice;\u000a",
+    "                auto triangle = std::array<Point, 3>();\u000a",
+    "                for (int j = 0; j < triangle.size(); ++j) {\u000a",
+    "                    triangle[j] = inputPoints[subtasks[i].cornerColor[j]][subtasks[i].corner[j]];\u000a",
+    "                }\u000a",
+    "                triangles.push_back(triangle);\u000a",
+    "                \u000a",
+    "                {\u000a",
+    "                    GD_LAYER();\u000a",
+    "                    for (auto curTriangle : triangles) {\u000a",
+    "                        GD_POLYGON(\u0022lightGray\u0022,\u000a",
+    "                            for (auto p : curTriangle) {\u000a",
+    "                                GD_POLYPOINT(p[0], p[1]);\u000a",
+    "                            }\u000a",
+    "                        );\u000a",
+    "                        GD_PAUSE();\u000a",
+    "                    }\u000a",
+    "                    GD_POLYGON(\u0022black\u0022,\u000a",
+    "                        for (auto p : triangles.back()) {\u000a",
+    "                            GD_POLYPOINT(p[0], p[1]);\u000a",
+    "                        });\u000a",
+    "                    GD_PAUSE() << \u0022This is the active triangle now!\u0022;\u000a",
+    "                }\u000a",
+    "\u000a",
+    "                for (int color = 0; color < 2; ++color) {\u000a",
+    "                    for (int index : orderedByX[color]) {\u000a",
+    "                        if (isInside(triangle, inputPoints[color][index]) \u000a",
+    "                                && (index != center || color != colorChoice)) {\u000a",
+    "                            subtasks[i].orderedByX[color].push_back(index);\u000a",
+    "                        }\u000a",
+    "                    }\u000a",
+    "                    for (int index : orderedByY[color]) {\u000a",
+    "                        if (isInside(triangle, inputPoints[color][index]) \u000a",
+    "                                && (index != center || color != colorChoice)) {\u000a",
+    "                            subtasks[i].orderedByY[color].push_back(index);\u000a",
+    "                        }\u000a",
+    "                    }\u000a",
+    "                }\u000a",
+    "                subtasks[i].doit(inputPoints, depth + 1, triangles);\u000a",
+    "                triangles.pop_back();\u000a",
+    "            }\u000a",
+    "\u000a",
+    "        }\u000a",
+    "    }\u000a",
+    "\u000a",
+    "    std::array<int, 3> corner;\u000a",
+    "    std::array<int, 3> cornerColor;\u000a",
+    "    std::array<std::vector<int>, 2> orderedByX;\u000a",
+    "    std::array<std::vector<int>, 2> orderedByY;\u000a",
+    "};\u000a",
+    "\u000a",
+    "void doit() {\u000a",
+    "    GD_INIT(\u0022points.html\u0022);\u000a",
+    "    auto inputPoints = std::array<std::vector<Point>, 2>();\u000a",
+    "    for (int color = 0; color < inputPoints.size(); ++color) {\u000a",
+    "        const int count = next<int>();\u000a",
+    "        inputPoints[color] = std::vector<Point>(count);\u000a",
+    "        for (auto &point : inputPoints[color]) {\u000a",
+    "            for (auto &coord : point) coord = next<int>();\u000a",
+    "            GD_POINT(point[0], point[1], (color == 0) ? \u0022green\u0022 : \u0022red\u0022);\u000a",
+    "        }\u000a",
+    "    }\u000a",
+    "\u000a",
+    "    auto orderedByX = std::array<std::vector<int>, 2>();\u000a",
+    "    auto orderedByY = std::array<std::vector<int>, 2>();\u000a",
+    "    for (int color = 0; color < inputPoints.size(); ++color) {\u000a",
+    "        auto orderBy = [&](int coord) -> std::vector<int> {\u000a",
+    "            auto order = std::vector<int>(inputPoints[color].size() - 2);\u000a",
+    "            for (int i = 0; i < order.size(); ++i) order[i] = i + 2;\u000a",
+    "            std::sort(order.begin(), order.end(), [&](int lhs, int rhs) -> int {\u000a",
+    "                return inputPoints[color][lhs][coord] < inputPoints[color][rhs][coord];\u000a",
+    "            });\u000a",
+    "            return order;\u000a",
+    "        };\u000a",
+    "        orderedByX[color] = orderBy(0);\u000a",
+    "        orderedByY[color] = orderBy(1);\u000a",
+    "    }\u000a",
+    "\u000a",
+    "    auto tasks = std::array<Task, 2>();\u000a",
+    "    for (int i = 0; i < tasks.size(); ++i) {\u000a",
+    "        for (int j = 0; j < 2; ++j) {\u000a",
+    "            tasks[i].corner[j] = j;\u000a",
+    "            tasks[i].cornerColor[j] = i;\u000a",
+    "        }\u000a",
+    "        tasks[i].corner[2] = i;\u000a",
+    "        tasks[i].cornerColor[2] = 1 - i;\u000a",
+    "        \u000a",
+    "        auto triangle = std::array<Point, 3>();\u000a",
+    "        for (int j = 0; j < triangle.size(); ++j) {\u000a",
+    "            triangle[j] = inputPoints[tasks[i].cornerColor[j]][tasks[i].corner[j]];\u000a",
+    "        }\u000a",
+    "        tasks[i].report(0, 1, i, inputPoints);\u000a",
+    "        for (int color = 0; color < 2; ++color) {\u000a",
+    "            for (int index : orderedByX[color]) {\u000a",
+    "                if (isInside(triangle, inputPoints[color][index])) {\u000a",
+    "                    tasks[i].orderedByX[color].push_back(index);\u000a",
+    "                }\u000a",
+    "            }\u000a",
+    "            for (int index : orderedByY[color]) {\u000a",
+    "                if (isInside(triangle, inputPoints[color][index])) {\u000a",
+    "                    tasks[i].orderedByY[color].push_back(index);\u000a",
+    "                }\u000a",
+    "            }\u000a",
+    "            assert(tasks[i].orderedByX[color].size() == tasks[i].orderedByY[color].size());\u000a",
+    "        }\u000a",
+    "    }\u000a",
+    "    for (auto &task : tasks) {\u000a",
+    "        std::vector<std::array<Point, 3>> triangles;\u000a",
+    "        task.doit(inputPoints, 0, triangles);\u000a",
+    "    }\u000a",
+    "    for (int step = 0; step < 100; ++step) {\u000a",
+    "        GD_PAUSE();\u000a",
+    "    }\u000a",
+    "}\u000a",
+    "\u000a",
+    "int main() {\u000a",
+    "    doit();\u000a",
+    "    return 0;\u000a",
+    "}"
+  ],
+  "root": {
+    "type": "begin",
+    "line": 150,
+    "children": [
+      {
+        "type": "point",
+        "line": 157,
+        "x": 0.000000,
+        "y": 200000000.000000,
+        "attr": "green"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 200000000.000000,
+        "y": 200000000.000000,
+        "attr": "green"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 89910974.000000,
+        "y": 126164468.000000,
+        "attr": "green"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 21152091.000000,
+        "y": 112115528.000000,
+        "attr": "green"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 99268628.000000,
+        "y": 110509673.000000,
+        "attr": "green"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 190244555.000000,
+        "y": 164233200.000000,
+        "attr": "green"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 58275294.000000,
+        "y": 162612016.000000,
+        "attr": "green"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 110564657.000000,
+        "y": 85910989.000000,
+        "attr": "green"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 155843836.000000,
+        "y": 71880146.000000,
+        "attr": "green"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 70582078.000000,
+        "y": 182509381.000000,
+        "attr": "green"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 123908978.000000,
+        "y": 47896434.000000,
+        "attr": "green"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 15121927.000000,
+        "y": 152461588.000000,
+        "attr": "green"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 41188953.000000,
+        "y": 122865202.000000,
+        "attr": "green"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 50397469.000000,
+        "y": 154815829.000000,
+        "attr": "green"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 116447280.000000,
+        "y": 108092773.000000,
+        "attr": "green"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 0.000000,
+        "y": 0.000000,
+        "attr": "red"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 200000000.000000,
+        "y": 0.000000,
+        "attr": "red"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 85045954.000000,
+        "y": 103259189.000000,
+        "attr": "red"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 154073648.000000,
+        "y": 151702444.000000,
+        "attr": "red"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 160456989.000000,
+        "y": 88762544.000000,
+        "attr": "red"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 102143477.000000,
+        "y": 79943755.000000,
+        "attr": "red"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 59548819.000000,
+        "y": 143449726.000000,
+        "attr": "red"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 10675674.000000,
+        "y": 61464743.000000,
+        "attr": "red"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 130746523.000000,
+        "y": 189922935.000000,
+        "attr": "red"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 122982217.000000,
+        "y": 176691001.000000,
+        "attr": "red"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 139962959.000000,
+        "y": 69193242.000000,
+        "attr": "red"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 194924622.000000,
+        "y": 151871766.000000,
+        "attr": "red"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 160217391.000000,
+        "y": 42488535.000000,
+        "attr": "red"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 126668345.000000,
+        "y": 62679619.000000,
+        "attr": "red"
+      },
+      {
+        "type": "point",
+        "line": 157,
+        "x": 166564105.000000,
+        "y": 120215569.000000,
+        "attr": "red"
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 0.000000,
+        "y1": 200000000.000000,
+        "x2": 200000000.000000,
+        "y2": 200000000.000000,
+        "attr": "green thick",
+        "label": "Connecting green!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 0.000000,
+        "y1": 0.000000,
+        "x2": 200000000.000000,
+        "y2": 0.000000,
+        "attr": "red thick",
+        "label": "Connecting red!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 85045954.000000,
+        "y1": 103259189.000000,
+        "x2": 0.000000,
+        "y2": 0.000000,
+        "attr": "red thick",
+        "label": "Connecting red!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 200000000.000000],
+              [200000000.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [0.000000, 200000000.000000],
+              [200000000.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 122982217.000000,
+        "y1": 176691001.000000,
+        "x2": 85045954.000000,
+        "y2": 103259189.000000,
+        "attr": "red thick",
+        "label": "Connecting red!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 200000000.000000],
+              [200000000.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 200000000.000000],
+              [200000000.000000, 200000000.000000],
+              [122982217.000000, 176691001.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [0.000000, 200000000.000000],
+              [200000000.000000, 200000000.000000],
+              [122982217.000000, 176691001.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 75,
+        "label": "All points inside the active triangle are the same color!"
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 122982217.000000,
+        "y1": 176691001.000000,
+        "x2": 130746523.000000,
+        "y2": 189922935.000000,
+        "attr": "red thick",
+        "label": "Connecting red!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 200000000.000000],
+              [200000000.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000],
+              [122982217.000000, 176691001.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000],
+              [122982217.000000, 176691001.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 200000000.000000],
+              [200000000.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 200000000.000000],
+              [122982217.000000, 176691001.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 200000000.000000],
+              [122982217.000000, 176691001.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 70582078.000000,
+        "y1": 182509381.000000,
+        "x2": 0.000000,
+        "y2": 200000000.000000,
+        "attr": "green thick",
+        "label": "Connecting green!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 200000000.000000],
+              [200000000.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 200000000.000000],
+              [122982217.000000, 176691001.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 200000000.000000],
+              [70582078.000000, 182509381.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 200000000.000000],
+              [70582078.000000, 182509381.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 59548819.000000,
+        "y1": 143449726.000000,
+        "x2": 85045954.000000,
+        "y2": 103259189.000000,
+        "attr": "red thick",
+        "label": "Connecting red!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 200000000.000000],
+              [200000000.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 200000000.000000],
+              [122982217.000000, 176691001.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 200000000.000000],
+              [70582078.000000, 182509381.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 200000000.000000],
+              [59548819.000000, 143449726.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 200000000.000000],
+              [59548819.000000, 143449726.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 200000000.000000],
+              [200000000.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 200000000.000000],
+              [122982217.000000, 176691001.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 200000000.000000],
+              [70582078.000000, 182509381.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 200000000.000000],
+              [70582078.000000, 182509381.000000],
+              [59548819.000000, 143449726.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [0.000000, 200000000.000000],
+              [70582078.000000, 182509381.000000],
+              [59548819.000000, 143449726.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 75,
+        "label": "All points inside the active triangle are the same color!"
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 0.000000,
+        "y1": 200000000.000000,
+        "x2": 50397469.000000,
+        "y2": 154815829.000000,
+        "attr": "green thick",
+        "label": "Connecting green!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 0.000000,
+        "y1": 200000000.000000,
+        "x2": 58275294.000000,
+        "y2": 162612016.000000,
+        "attr": "green thick",
+        "label": "Connecting green!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 200000000.000000],
+              [200000000.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 200000000.000000],
+              [122982217.000000, 176691001.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 200000000.000000],
+              [70582078.000000, 182509381.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [70582078.000000, 182509381.000000],
+              [85045954.000000, 103259189.000000],
+              [59548819.000000, 143449726.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [70582078.000000, 182509381.000000],
+              [85045954.000000, 103259189.000000],
+              [59548819.000000, 143449726.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 200000000.000000],
+              [200000000.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 200000000.000000],
+              [122982217.000000, 176691001.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 200000000.000000],
+              [122982217.000000, 176691001.000000],
+              [70582078.000000, 182509381.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [0.000000, 200000000.000000],
+              [122982217.000000, 176691001.000000],
+              [70582078.000000, 182509381.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 200000000.000000],
+              [200000000.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 200000000.000000],
+              [122982217.000000, 176691001.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [122982217.000000, 176691001.000000],
+              [85045954.000000, 103259189.000000],
+              [70582078.000000, 182509381.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [122982217.000000, 176691001.000000],
+              [85045954.000000, 103259189.000000],
+              [70582078.000000, 182509381.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 75,
+        "label": "All points inside the active triangle are the same color!"
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 70582078.000000,
+        "y1": 182509381.000000,
+        "x2": 89910974.000000,
+        "y2": 126164468.000000,
+        "attr": "green thick",
+        "label": "Connecting green!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 75,
+        "label": "All points inside the active triangle are the same color!"
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 200000000.000000,
+        "y1": 200000000.000000,
+        "x2": 99268628.000000,
+        "y2": 110509673.000000,
+        "attr": "green thick",
+        "label": "Connecting green!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 0.000000],
+              [0.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [0.000000, 0.000000],
+              [0.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 41188953.000000,
+        "y1": 122865202.000000,
+        "x2": 0.000000,
+        "y2": 200000000.000000,
+        "attr": "green thick",
+        "label": "Connecting green!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 0.000000],
+              [0.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 0.000000],
+              [0.000000, 200000000.000000],
+              [41188953.000000, 122865202.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [0.000000, 0.000000],
+              [0.000000, 200000000.000000],
+              [41188953.000000, 122865202.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 10675674.000000,
+        "y1": 61464743.000000,
+        "x2": 0.000000,
+        "y2": 0.000000,
+        "attr": "red thick",
+        "label": "Connecting red!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 0.000000],
+              [0.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 0.000000],
+              [0.000000, 200000000.000000],
+              [41188953.000000, 122865202.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 0.000000],
+              [0.000000, 200000000.000000],
+              [10675674.000000, 61464743.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [0.000000, 0.000000],
+              [0.000000, 200000000.000000],
+              [10675674.000000, 61464743.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 0.000000],
+              [0.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 0.000000],
+              [0.000000, 200000000.000000],
+              [41188953.000000, 122865202.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 200000000.000000],
+              [41188953.000000, 122865202.000000],
+              [10675674.000000, 61464743.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [0.000000, 200000000.000000],
+              [41188953.000000, 122865202.000000],
+              [10675674.000000, 61464743.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 75,
+        "label": "All points inside the active triangle are the same color!"
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 0.000000,
+        "y1": 200000000.000000,
+        "x2": 15121927.000000,
+        "y2": 152461588.000000,
+        "attr": "green thick",
+        "label": "Connecting green!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 0.000000,
+        "y1": 200000000.000000,
+        "x2": 21152091.000000,
+        "y2": 112115528.000000,
+        "attr": "green thick",
+        "label": "Connecting green!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 0.000000],
+              [0.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 0.000000],
+              [0.000000, 200000000.000000],
+              [41188953.000000, 122865202.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [41188953.000000, 122865202.000000],
+              [0.000000, 0.000000],
+              [10675674.000000, 61464743.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [41188953.000000, 122865202.000000],
+              [0.000000, 0.000000],
+              [10675674.000000, 61464743.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 0.000000],
+              [0.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000],
+              [41188953.000000, 122865202.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [0.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000],
+              [41188953.000000, 122865202.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 0.000000],
+              [0.000000, 200000000.000000],
+              [85045954.000000, 103259189.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 0.000000],
+              [41188953.000000, 122865202.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [85045954.000000, 103259189.000000],
+              [0.000000, 0.000000],
+              [41188953.000000, 122865202.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 123908978.000000,
+        "y1": 47896434.000000,
+        "x2": 200000000.000000,
+        "y2": 200000000.000000,
+        "attr": "green thick",
+        "label": "Connecting green!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 0.000000],
+              [200000000.000000, 0.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [0.000000, 0.000000],
+              [200000000.000000, 0.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 160456989.000000,
+        "y1": 88762544.000000,
+        "x2": 200000000.000000,
+        "y2": 0.000000,
+        "attr": "red thick",
+        "label": "Connecting red!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [160456989.000000, 88762544.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [160456989.000000, 88762544.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 190244555.000000,
+        "y1": 164233200.000000,
+        "x2": 200000000.000000,
+        "y2": 200000000.000000,
+        "attr": "green thick",
+        "label": "Connecting green!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [160456989.000000, 88762544.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [190244555.000000, 164233200.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [190244555.000000, 164233200.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 75,
+        "label": "All points inside the active triangle are the same color!"
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 200000000.000000,
+        "y1": 0.000000,
+        "x2": 194924622.000000,
+        "y2": 151871766.000000,
+        "attr": "red thick",
+        "label": "Connecting red!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [160456989.000000, 88762544.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [160456989.000000, 88762544.000000],
+              [190244555.000000, 164233200.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [160456989.000000, 88762544.000000],
+              [190244555.000000, 164233200.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [160456989.000000, 88762544.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [160456989.000000, 88762544.000000],
+              [200000000.000000, 0.000000],
+              [190244555.000000, 164233200.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [160456989.000000, 88762544.000000],
+              [200000000.000000, 0.000000],
+              [190244555.000000, 164233200.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [123908978.000000, 47896434.000000],
+              [160456989.000000, 88762544.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [123908978.000000, 47896434.000000],
+              [160456989.000000, 88762544.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 75,
+        "label": "All points inside the active triangle are the same color!"
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 160456989.000000,
+        "y1": 88762544.000000,
+        "x2": 139962959.000000,
+        "y2": 69193242.000000,
+        "attr": "red thick",
+        "label": "Connecting red!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 160456989.000000,
+        "y1": 88762544.000000,
+        "x2": 166564105.000000,
+        "y2": 120215569.000000,
+        "attr": "red thick",
+        "label": "Connecting red!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [123908978.000000, 47896434.000000],
+              [200000000.000000, 0.000000],
+              [160456989.000000, 88762544.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [123908978.000000, 47896434.000000],
+              [200000000.000000, 0.000000],
+              [160456989.000000, 88762544.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 155843836.000000,
+        "y1": 71880146.000000,
+        "x2": 123908978.000000,
+        "y2": 47896434.000000,
+        "attr": "green thick",
+        "label": "Connecting green!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [123908978.000000, 47896434.000000],
+              [200000000.000000, 0.000000],
+              [160456989.000000, 88762544.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [123908978.000000, 47896434.000000],
+              [200000000.000000, 0.000000],
+              [155843836.000000, 71880146.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [123908978.000000, 47896434.000000],
+              [200000000.000000, 0.000000],
+              [155843836.000000, 71880146.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 75,
+        "label": "All points inside the active triangle are the same color!"
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 200000000.000000,
+        "y1": 0.000000,
+        "x2": 160217391.000000,
+        "y2": 42488535.000000,
+        "attr": "red thick",
+        "label": "Connecting red!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [123908978.000000, 47896434.000000],
+              [200000000.000000, 0.000000],
+              [160456989.000000, 88762544.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [160456989.000000, 88762544.000000],
+              [155843836.000000, 71880146.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [200000000.000000, 0.000000],
+              [160456989.000000, 88762544.000000],
+              [155843836.000000, 71880146.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 0.000000],
+              [200000000.000000, 200000000.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [123908978.000000, 47896434.000000],
+              [200000000.000000, 0.000000],
+              [160456989.000000, 88762544.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [160456989.000000, 88762544.000000],
+              [123908978.000000, 47896434.000000],
+              [155843836.000000, 71880146.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [160456989.000000, 88762544.000000],
+              [123908978.000000, 47896434.000000],
+              [155843836.000000, 71880146.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 102143477.000000,
+        "y1": 79943755.000000,
+        "x2": 0.000000,
+        "y2": 0.000000,
+        "attr": "red thick",
+        "label": "Connecting red!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [102143477.000000, 79943755.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [102143477.000000, 79943755.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 116447280.000000,
+        "y1": 108092773.000000,
+        "x2": 200000000.000000,
+        "y2": 200000000.000000,
+        "attr": "green thick",
+        "label": "Connecting green!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [102143477.000000, 79943755.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [116447280.000000, 108092773.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [116447280.000000, 108092773.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 75,
+        "label": "All points inside the active triangle are the same color!"
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 0.000000,
+        "y1": 0.000000,
+        "x2": 154073648.000000,
+        "y2": 151702444.000000,
+        "attr": "red thick",
+        "label": "Connecting red!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [102143477.000000, 79943755.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 0.000000],
+              [102143477.000000, 79943755.000000],
+              [116447280.000000, 108092773.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [0.000000, 0.000000],
+              [102143477.000000, 79943755.000000],
+              [116447280.000000, 108092773.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [102143477.000000, 79943755.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [102143477.000000, 79943755.000000],
+              [200000000.000000, 200000000.000000],
+              [116447280.000000, 108092773.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [102143477.000000, 79943755.000000],
+              [200000000.000000, 200000000.000000],
+              [116447280.000000, 108092773.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [0.000000, 0.000000],
+              [123908978.000000, 47896434.000000],
+              [102143477.000000, 79943755.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [0.000000, 0.000000],
+              [123908978.000000, 47896434.000000],
+              [102143477.000000, 79943755.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [123908978.000000, 47896434.000000],
+              [200000000.000000, 200000000.000000],
+              [102143477.000000, 79943755.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [123908978.000000, 47896434.000000],
+              [200000000.000000, 200000000.000000],
+              [102143477.000000, 79943755.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 126668345.000000,
+        "y1": 62679619.000000,
+        "x2": 102143477.000000,
+        "y2": 79943755.000000,
+        "attr": "red thick",
+        "label": "Connecting red!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [123908978.000000, 47896434.000000],
+              [200000000.000000, 200000000.000000],
+              [102143477.000000, 79943755.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [123908978.000000, 47896434.000000],
+              [200000000.000000, 200000000.000000],
+              [126668345.000000, 62679619.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [123908978.000000, 47896434.000000],
+              [200000000.000000, 200000000.000000],
+              [126668345.000000, 62679619.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [123908978.000000, 47896434.000000],
+              [200000000.000000, 200000000.000000],
+              [102143477.000000, 79943755.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [102143477.000000, 79943755.000000],
+              [126668345.000000, 62679619.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [102143477.000000, 79943755.000000],
+              [126668345.000000, 62679619.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 75,
+        "label": "All points inside the active triangle are the same color!"
+      },
+      {
+        "type": "segment",
+        "line": 45,
+        "x1": 200000000.000000,
+        "y1": 200000000.000000,
+        "x2": 110564657.000000,
+        "y2": 85910989.000000,
+        "attr": "green thick",
+        "label": "Connecting green!"
+      },
+      {
+        "type": "break",
+        "line": 46
+      },
+      {
+        "type": "layer",
+        "line": 106,
+        "children": [
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [200000000.000000, 200000000.000000],
+              [0.000000, 0.000000],
+              [123908978.000000, 47896434.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [123908978.000000, 47896434.000000],
+              [200000000.000000, 200000000.000000],
+              [102143477.000000, 79943755.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 112,
+            "attr": "lightGray",
+            "points": [
+              [102143477.000000, 79943755.000000],
+              [123908978.000000, 47896434.000000],
+              [126668345.000000, 62679619.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 113
+          },
+          {
+            "type": "polygon",
+            "line": 118,
+            "attr": "black",
+            "points": [
+              [102143477.000000, 79943755.000000],
+              [123908978.000000, 47896434.000000],
+              [126668345.000000, 62679619.000000]
+            ]
+          },
+          {
+            "type": "break",
+            "line": 119,
+            "label": "This is the active triangle now!"
+          }
+        ]
+      },
+      {
+        "type": "break",
+        "line": 72,
+        "label": "The active triangle is empty!"
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      },
+      {
+        "type": "break",
+        "line": 209
+      }
+    ]
+  },
+  "theme": "light"
+};
+init(resourcePath);
+</script>
+</html>
